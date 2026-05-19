@@ -221,6 +221,24 @@
     }
   }
 
+  function handleContainerKeydown(e) {
+    const step = e.shiftKey ? 80 : 30;
+
+    if (e.key === 'ArrowLeft') {
+      viewX += step;
+    } else if (e.key === 'ArrowRight') {
+      viewX -= step;
+    } else if (e.key === 'ArrowUp') {
+      viewY += step;
+    } else if (e.key === 'ArrowDown') {
+      viewY -= step;
+    } else {
+      return;
+    }
+
+    e.preventDefault();
+  }
+
   function handleNodeMouseDown(e, node) {
     e.stopPropagation(); // prevent panning
     if (e.target.closest('button')) return;
@@ -649,6 +667,10 @@
     bind:this={viewportElement}
     on:mousedown={handleContainerMouseDown}
     on:wheel={handleWheel}
+    on:keydown={handleContainerKeydown}
+    role="button"
+    tabindex="0"
+    aria-label={$t('knowledge_board.title')}
     class="flex-1 overflow-hidden relative w-full h-full bg-[#f0f0f0] cursor-grab active:cursor-grabbing no-scrollbar block select-none"
   >
     <div class="absolute inset-0 z-0 bg-grid-pattern pointer-events-none"></div>

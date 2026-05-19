@@ -351,7 +351,7 @@
     return ancestorIds;
   }
 
-  function handleSelectItem(item: TocEntry, event: MouseEvent) {
+  function handleSelectItem(item: TocEntry, event: MouseEvent | KeyboardEvent) {
     const flatItems = flattenTocItems($tocItems);
     const indexMap = getFlatIndexMap(flatItems);
     const clickedIndex = indexMap.get(item.id);

@@ -11,3 +11,4 @@
 - Added File System Access based PDF opening so full-PDF export can ask to replace the original file, while Save As starts from the source file location when available.
 - Fixed direct replacement by requesting source-file write permission before PDF generation consumes browser user activation.
 - Added configurable text and vision models for AI providers, plus custom OpenAI-compatible provider settings.
+- Cleared production build warnings from Svelte accessibility checks, pdf.js SSR imports, Upstash initialization, Browserslist data, and unused imports.

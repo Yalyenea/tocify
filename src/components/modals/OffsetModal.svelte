@@ -19,23 +19,46 @@
       dispatch('update:offsetPreviewPageNum', offsetPreviewPageNum);
     }
   }
+
+  function closeModal() {
+    showOffsetModal = false;
+  }
+
+  function closeOnBackdropClick(event: MouseEvent) {
+    if (event.target === event.currentTarget) {
+      closeModal();
+    }
+  }
+
+  function closeOnKeydown(event: KeyboardEvent) {
+    if (event.key === 'Escape' || event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      closeModal();
+    }
+  }
 </script>
 
 {#if showOffsetModal && firstTocItem}
   <div
     class="fixed inset-0 bg-lime-400 flex items-center justify-center z-50 p-4"
     transition:fade={{duration: 150}}
-    on:click={() => (showOffsetModal = false)}
+    role="button"
+    tabindex="0"
+    aria-label="Close offset dialog"
+    on:click={closeOnBackdropClick}
+    on:keydown={closeOnKeydown}
   >
     <div
       class="bg-white rounded-lg p-6 w-[95%] md:w-[85%] max-w-5xl max-h-[90vh] overflow-y-auto border-4 border-black shadow-[8px_8px_0px_rgba(0,0,0,1)]"
       transition:fly={{y: 20, duration: 200}}
-      on:click|stopPropagation
+      role="dialog"
+      aria-modal="true"
+      tabindex="-1"
     >
       <div class="flex justify-between items-start mb-4">
         <h2 class="text-xl md:text-2xl font-bold">{$t('offset.title')}</h2>
         <button
-          on:click={() => (showOffsetModal = false)}
+          on:click={closeModal}
           class="p-1 rounded-full text-black hover:bg-black hover:text-white transition-colors"
           aria-label="Close modal"
         >
@@ -48,7 +71,7 @@
             {$t('offset.found_prefix')}
             <strong class="text-black text-2xl md:text-3xl block my-2">{firstTocItem?.title}</strong>
             {$t('offset.found_on_prefix')}
-            <div class="my-2" />
+            <div class="my-2"></div>
             <div class="flex items-center gap-4">
               <strong class="text-black text-2xl md:text-3xl">
                 {$t('offset.page_n', {

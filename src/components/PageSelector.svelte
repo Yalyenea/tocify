@@ -21,6 +21,13 @@
     dispatch('setActiveRange', {index});
   }
 
+  function handleRangeKeydown(event: KeyboardEvent, index: number) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      setActiveRange(index);
+    }
+  }
+
   function handleRangeChange() {
     dispatch('rangeChange');
   }
@@ -45,7 +52,11 @@
         activeRangeIndex
           ? 'border-blue-500 bg-white/50'
           : 'border-transparent hover:bg-black/[0.03]'}"
+        role="button"
+        tabindex="0"
+        aria-label={$t('label.range_n', {values: {n: i + 1}})}
         on:click={() => setActiveRange(i)}
+        on:keydown={(event) => handleRangeKeydown(event, i)}
       >
         <div class="flex items-center justify-between">
           <span class="text-xs font-bold text-gray-500 uppercase tracking-wider"

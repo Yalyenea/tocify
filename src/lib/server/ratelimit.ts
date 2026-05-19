@@ -8,10 +8,16 @@ export const LIMIT_CONFIG = {
   MAX_TEXT_SIZE_KB: 128
 };
 
-const redis = new Redis({
-  url: env.UPSTASH_REDIS_REST_URL,
-  token: env.UPSTASH_REDIS_REST_TOKEN,
-});
+function createRedis() {
+  if (!env.UPSTASH_REDIS_REST_URL || !env.UPSTASH_REDIS_REST_TOKEN) {
+    return null;
+  }
+
+  return new Redis({
+    url: env.UPSTASH_REDIS_REST_URL,
+    token: env.UPSTASH_REDIS_REST_TOKEN,
+  });
+}
 
 export function getClientIp(request: Request): string {
   const headers = request.headers;
@@ -30,6 +36,20 @@ export function getClientIp(request: Request): string {
 export async function checkRateLimit(
   request: Request, limitCount: number, prefix: string): Promise<Response | null> {
   const clientIp = getClientIp(request);
+  const redis = createRedis();
+
+  if (!redis) {
+    return new Response(
+      JSON.stringify({
+        error: 'Rate limit is not configured',
+        message: 'Server-side AI keys require UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN.',
+      }),
+      {
+        status: 500,
+        headers: {'Content-Type': 'application/json'},
+      },
+    );
+  }
 
   if (clientIp !== 'unknown') {
     const ratelimit = new Ratelimit({

@@ -4,18 +4,41 @@
   import {t} from 'svelte-i18n';
 
   export let showHelpModal: boolean;
+
+  function closeModal() {
+    showHelpModal = false;
+  }
+
+  function closeOnBackdropClick(event: MouseEvent) {
+    if (event.target === event.currentTarget) {
+      closeModal();
+    }
+  }
+
+  function closeOnKeydown(event: KeyboardEvent) {
+    if (event.key === 'Escape' || event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      closeModal();
+    }
+  }
 </script>
 
 {#if showHelpModal}
   <div
     class="fixed inset-0 bg-lime-400 flex items-center justify-center z-50 p-4"
     transition:fade={{duration: 150}}
-    on:click={() => (showHelpModal = false)}
+    role="button"
+    tabindex="0"
+    aria-label="Close help"
+    on:click={closeOnBackdropClick}
+    on:keydown={closeOnKeydown}
   >
     <div
       class="bg-white rounded-lg p-6 max-w-5xl w-full max-h-[90vh] overflow-y-auto border-4 border-black shadow-[8px_8px_0px_rgba(0,0,0,1)]"
       transition:fly={{y: 20, duration: 200}}
-      on:click|stopPropagation
+      role="dialog"
+      aria-modal="true"
+      tabindex="-1"
     >
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div class="flex flex-wrap items-center gap-4">
@@ -23,7 +46,7 @@
         </div>
 
         <button
-          on:click={() => (showHelpModal = false)}
+          on:click={closeModal}
           class="absolute top-4 right-4 md:relative md:top-auto md:right-auto p-2 border-2 border-transparent hover:border-black rounded hover:bg-gray-100 transition-all"
           aria-label="Close modal"
         >

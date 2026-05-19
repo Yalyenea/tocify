@@ -1,10 +1,9 @@
 import { browser } from '$app/environment';
 import { PDFDocument } from 'pdf-lib';
 import fontkit from 'pdf-fontkit';
-import * as pdfjsLib from 'pdfjs-dist';
+import type * as PdfjsLibTypes from 'pdfjs-dist';
 import { type TocConfig } from '../../stores';
 import { A4_WIDTH, BASE_FONT_SIZE_L1, BASE_FONT_SIZE_OTHER } from '../constants';
-import { isLegacyBrowser } from '$lib/utils';
 
 export interface TocItem {
   id: string;
@@ -18,7 +17,7 @@ export interface TocItem {
 export interface PDFState {
   doc: PDFDocument | null;
   newDoc: PDFDocument | null;
-  instance: pdfjsLib.PDFDocumentProxy | null;
+  instance: PdfjsLibTypes.PDFDocumentProxy | null;
   filename: string;
   currentPage: number;
   totalPages: number;
@@ -37,13 +36,7 @@ if (typeof Promise.withResolvers === 'undefined') {
   };
 }
 
-if (browser) {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = isLegacyBrowser() ? '/pdf.worker.legacy.min.mjs' : '/pdf.worker.min.mjs';
-}
-
 export class PDFService {
-  static sharedWorker: pdfjsLib.PDFWorker | null = browser ? new pdfjsLib.PDFWorker() : null;
-
   static regularFontBytes: Map<string, ArrayBuffer> = new Map();
   static boldFontBytes: Map<string, ArrayBuffer> = new Map();
   static fontLoadingPromises: Map<string, Promise<void>> = new Map();
@@ -84,10 +77,6 @@ export class PDFService {
   private workerLoadedFonts: Set<string> = new Set();
 
   constructor () {
-    if (browser && !PDFService.sharedWorker) {
-      PDFService.sharedWorker = new pdfjsLib.PDFWorker();
-    }
-    // Initialize Worker
     if (browser) {
       this.initWorker();
     }
@@ -220,7 +209,7 @@ export class PDFService {
   }
 
   async renderPage(
-    pdf: pdfjsLib.PDFDocumentProxy, pageNum: number, scale: number = 1.0) {
+    pdf: PdfjsLibTypes.PDFDocumentProxy, pageNum: number, scale: number = 1.0) {
     if (!pdf) return;
     const canvas = document.getElementById('pdf-canvas') as HTMLCanvasElement;
     if (!canvas) {
@@ -248,11 +237,11 @@ export class PDFService {
     }
   }
 
-  private static canvasRenderTasks = new WeakMap<HTMLCanvasElement, pdfjsLib.RenderTask>();
+  private static canvasRenderTasks = new WeakMap<HTMLCanvasElement, PdfjsLibTypes.RenderTask>();
 
   async renderPageToCanvas(
-    pdfDoc: pdfjsLib.PDFDocumentProxy, pageNumber: number,
-    canvas: HTMLCanvasElement, width: number): Promise<pdfjsLib.RenderTask | undefined> {
+    pdfDoc: PdfjsLibTypes.PDFDocumentProxy, pageNumber: number,
+    canvas: HTMLCanvasElement, width: number): Promise<PdfjsLibTypes.RenderTask | undefined> {
 
     const existingTask = PDFService.canvasRenderTasks.get(canvas);
     if (existingTask) {

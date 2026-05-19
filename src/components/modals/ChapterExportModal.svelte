@@ -122,18 +122,41 @@
 
     return true;
   }
+
+  function closeModal() {
+    showChapterExportModal = false;
+  }
+
+  function closeOnBackdropClick(event: MouseEvent) {
+    if (event.target === event.currentTarget) {
+      closeModal();
+    }
+  }
+
+  function closeOnKeydown(event: KeyboardEvent) {
+    if (event.key === 'Escape' || event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      closeModal();
+    }
+  }
 </script>
 
 {#if showChapterExportModal}
   <div
     class="fixed inset-0 bg-black/40 backdrop-blur-[1px] flex items-center justify-center z-50 p-4"
     transition:fade={{duration: 150}}
-    on:click={() => (showChapterExportModal = false)}
+    role="button"
+    tabindex="0"
+    aria-label={$t('chapter_export.close')}
+    on:click={closeOnBackdropClick}
+    on:keydown={closeOnKeydown}
   >
     <div
       class="bg-white rounded-lg p-5 md:p-6 w-[90%] md:w-[80%] max-w-3xl max-h-[90vh] overflow-y-auto border-2 border-gray-300 "
       transition:fly={{y: 20, duration: 200}}
-      on:click|stopPropagation
+      role="dialog"
+      aria-modal="true"
+      tabindex="-1"
     >
       <div class="flex justify-between items-start gap-4 mb-4">
         <div>
@@ -141,7 +164,7 @@
           <p class="text-sm text-gray-700 mt-1">{$t('chapter_export.description')}</p>
         </div>
         <button
-          on:click={() => (showChapterExportModal = false)}
+          on:click={closeModal}
           class="p-1 rounded-full text-black hover:bg-gray-100 transition-colors"
           aria-label={$t('chapter_export.close')}
         >

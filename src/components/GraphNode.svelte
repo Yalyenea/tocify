@@ -8,6 +8,13 @@
   export let activeNodeId;
   export let isDragTarget;
   const dispatch = createEventDispatcher();
+
+  function handleKeydown(event) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      dispatch('click');
+    }
+  }
 </script>
 
 <div
@@ -21,8 +28,12 @@
         height: {CARD_H}px;
         cursor: grab;
         "
+  role="button"
+  tabindex="0"
+  aria-label={node.title}
   on:mousedown
   on:click
+  on:keydown={handleKeydown}
 >
   {#if node.isInferred}
     <div

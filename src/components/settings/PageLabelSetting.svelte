@@ -79,8 +79,9 @@
       </div>
       <div class="flex items-center gap-2">
         <div class="w-20">
-          <label class="text-xs text-gray-500 block mb-1">{$t('settings.start_page')}</label>
+          <label for={`page-label-start-${i}`} class="text-xs text-gray-500 block mb-1">{$t('settings.start_page')}</label>
           <input
+            id={`page-label-start-${i}`}
             type="number"
             min="1"
             class="w-full h-8 text-sm border-2 border-gray-300 rounded px-2 focus:outline-none focus:bg-gray-50"
@@ -91,8 +92,9 @@
         </div>
 
         <div class="flex-1 min-w-[120px]">
-          <label class="text-xs text-gray-500 block mb-1">{$t('settings.style')}</label>
+          <label for={`page-label-style-${i}`} class="text-xs text-gray-500 block mb-1">{$t('settings.style')}</label>
           <select
+            id={`page-label-style-${i}`}
             class="w-full h-8 text-sm border-2 border-gray-300 rounded px-2 bg-transparent focus:outline-none focus:ring-2 focus:ring-black/20"
             value={seg.style}
             on:change={(e) =>
@@ -107,8 +109,9 @@
 
       <div class="flex items-center gap-2 mt-2">
         <div class="flex-1 min-w-[120px]">
-          <label class="text-xs text-gray-500 block mb-1">{$t('settings.prefix')}</label>
+          <label for={`page-label-prefix-${i}`} class="text-xs text-gray-500 block mb-1">{$t('settings.prefix')}</label>
           <input
+            id={`page-label-prefix-${i}`}
             type="text"
             class="w-full h-8 text-sm border-2 border-gray-300 rounded px-2 focus:outline-none focus:bg-gray-50"
             placeholder="e.g. A-"
@@ -118,8 +121,9 @@
         </div>
 
         <div class="w-20">
-          <label class="text-xs text-gray-500 block mb-1">{$t('settings.start_at')}</label>
+          <label for={`page-label-start-at-${i}`} class="text-xs text-gray-500 block mb-1">{$t('settings.start_at')}</label>
           <input
+            id={`page-label-start-at-${i}`}
             type="number"
             min="1"
             class="w-full h-8 text-sm border-2 border-gray-300 rounded px-2 focus:outline-none focus:bg-gray-50"

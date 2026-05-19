@@ -18,7 +18,7 @@
   export let onDelete: (item: TocItem) => void;
   export let onDragStart: () => void = () => {};
   export let onDragEnd: () => void = () => {};
-  export let onSelect: (item: TocItem, event: MouseEvent) => void = () => {};
+  export let onSelect: (item: TocItem, event: MouseEvent | KeyboardEvent) => void = () => {};
   export let selectedIds: Set<string> = new Set();
 
   export let currentPage = 1;
@@ -184,6 +184,14 @@
     event.preventDefault();
   }
 
+  function handleRowKeydown(event: KeyboardEvent) {
+    if (isSelectionBlockedTarget(event.target)) return;
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      onSelect(item, event);
+    }
+  }
+
   function handleShiftSelectFromInput(event: MouseEvent) {
     if (!event.shiftKey) return;
     event.preventDefault();
@@ -201,9 +209,13 @@
       class:border-amber-400={isSelected}
       class:bg-amber-50={isSelected && !isActive}
       data-is-dnd-shadow-item-hint={isShadowItem}
+      role="button"
+      tabindex="0"
+      aria-label={item.title}
       on:mouseenter={handleMouseEnter}
       on:mousedown={handleRowMouseDown}
       on:click={handleRowClick}
+      on:keydown={handleRowKeydown}
     >
       <div
         class="flex items-center gap-1 flex-1 min-w-0 h-full"
@@ -219,8 +231,17 @@
         <div
           data-drag-handle
           class="cursor-grab active:cursor-grabbing rounded-md p-0.5 transition-opacity opacity-100 md:opacity-0 md:group-hover:opacity-100 text-gray-400"
+          role="button"
+          tabindex="0"
+          aria-label="Drag item"
           on:mousedown={enableDrag}
           on:touchstart={enableDrag}
+          on:keydown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              enableDrag();
+            }
+          }}
         >
           <GripVertical size={12} />
         </div>

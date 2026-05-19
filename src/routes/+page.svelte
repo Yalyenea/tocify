@@ -1206,7 +1206,16 @@
     <div
       transition:fade={{duration: 200}}
       class="flex-1 bg-black/20 backdrop-blur-sm cursor-pointer"
+      role="button"
+      tabindex="0"
+      aria-label="Close knowledge board"
       on:click={() => (showGraphDrawer = false)}
+      on:keydown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          showGraphDrawer = false;
+        }
+      }}
     ></div>
   {/if}
 </div>
