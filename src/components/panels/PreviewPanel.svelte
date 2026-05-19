@@ -30,10 +30,45 @@
   const dispatch = createEventDispatcher();
   let fileInputRef: HTMLInputElement;
 
+  type FileSystemFileHandleLike = {
+    getFile: () => Promise<File>;
+  };
+
+  const pdfPickerTypes = [
+    {
+      description: 'PDF Document',
+      accept: {'application/pdf': ['.pdf']},
+    },
+  ];
+
+  function dispatchFileSelection(file: File, handle: FileSystemFileHandleLike | null = null) {
+    dispatch('fileselect', {file, handle});
+  }
+
+  async function openPdfFilePicker() {
+    if ('showOpenFilePicker' in window) {
+      try {
+        const [handle] = await (window as any).showOpenFilePicker({
+          multiple: false,
+          excludeAcceptAllOption: true,
+          types: pdfPickerTypes,
+        });
+        const file = await handle.getFile();
+        dispatchFileSelection(file, handle);
+        return;
+      } catch (err: any) {
+        if (err.name === 'AbortError') return;
+        console.warn('showOpenFilePicker failed:', err);
+      }
+    }
+
+    fileInputRef?.click();
+  }
+
   function handleFileInputChange(e: Event) {
     const target = e.target as HTMLInputElement;
     if (target.files && target.files.length > 0) {
-      dispatch('fileselect', target.files[0]);
+      dispatchFileSelection(target.files[0]);
       target.value = '';
     }
   }
@@ -42,7 +77,7 @@
     isDragging = false;
     const {acceptedFiles} = e.detail;
     if (acceptedFiles.length) {
-      dispatch('fileselect', acceptedFiles[0]);
+      dispatchFileSelection(acceptedFiles[0]);
     }
   }
 
@@ -69,6 +104,8 @@
       <Dropzone
         containerClasses="absolute inset-0 w-full h-full"
         accept=".pdf"
+        multiple={false}
+        noClick
         disableDefaultStyles
         on:drop={handleDrop}
         on:dragenter={() => (isDragging = true)}
@@ -77,6 +114,7 @@
         <DropzoneView
           {isDragging}
           hasInstance={!!pdfState.instance}
+          on:openfile={openPdfFilePicker}
         />
       </Dropzone>
     {/if}
@@ -113,7 +151,7 @@
           {isPreviewMode}
           {originalPdfInstance}
           doc={pdfState.doc}
-          on:triggerUpload={() => fileInputRef?.click()}
+          on:triggerUpload={openPdfFilePicker}
           on:togglePreview={() => dispatch('togglePreview')}
           on:export={() => dispatch('export')}
           on:openChapterExport={() => dispatch('openChapterExport')}

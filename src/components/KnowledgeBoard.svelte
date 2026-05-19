@@ -20,7 +20,9 @@
   export let apiConfig = {
     provider: '',
     apiKey: '',
-    doubaoEndpointIdText: '',
+    baseUrl: '',
+    textModel: '',
+    customProviderName: '',
   };
 
   export let title = 'Untitled Book';
@@ -87,7 +89,9 @@
         ? await generateBoardDirect(simplifiedItems, {
           apiKey: apiConfig.apiKey,
           provider: apiConfig.provider,
-          doubaoEndpointIdText: apiConfig.doubaoEndpointIdText,
+          baseUrl: apiConfig.baseUrl,
+          textModel: apiConfig.textModel,
+          customProviderName: apiConfig.customProviderName,
         })
         : await (async () => {
           const response = await fetch('/api/generate-board', {
@@ -97,7 +101,9 @@
               tocItems: simplifiedItems,
               apiKey: apiConfig.apiKey,
               provider: apiConfig.provider,
-              doubaoEndpointIdText: apiConfig.doubaoEndpointIdText,
+              baseUrl: apiConfig.baseUrl,
+              textModel: apiConfig.textModel,
+              customProviderName: apiConfig.customProviderName,
             }),
           });
 

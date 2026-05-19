@@ -24,8 +24,10 @@ interface AiTocOptions {
   endPage?: number;
   apiKey?: string;
   provider?: string;
-  doubaoEndpointIdText?: string;
-  doubaoEndpointIdVision?: string;
+  baseUrl?: string;
+  textModel?: string;
+  visionModel?: string;
+  customProviderName?: string;
   onProgress?: (current: number, total: number) => void;
 }
 
@@ -42,16 +44,20 @@ async function fetchChunk(
   images: string[],
   apiKey: string | undefined,
   provider: string | undefined,
-  doubaoEndpointIdText: string | undefined,
-  doubaoEndpointIdVision: string | undefined,
+  baseUrl: string | undefined,
+  textModel: string | undefined,
+  visionModel: string | undefined,
+  customProviderName: string | undefined,
 ): Promise<any[]> {
   if (apiKey) {
     return processTocDirect({
       images,
       apiKey,
       provider,
-      doubaoEndpointIdText,
-      doubaoEndpointIdVision,
+      baseUrl,
+      textModel,
+      visionModel,
+      customProviderName,
     });
   }
 
@@ -62,8 +68,10 @@ async function fetchChunk(
       images,
       apiKey,
       provider,
-      doubaoEndpointIdText,
-      doubaoEndpointIdVision,
+      baseUrl,
+      textModel,
+      visionModel,
+      customProviderName,
     }),
   });
 
@@ -87,7 +95,7 @@ async function fetchChunk(
 }
 
 export async function generateToc(
-  { pdfInstance, ranges, startPage, endPage, apiKey, provider, doubaoEndpointIdText, doubaoEndpointIdVision, onProgress }: AiTocOptions
+  { pdfInstance, ranges, startPage, endPage, apiKey, provider, baseUrl, textModel, visionModel, customProviderName, onProgress }: AiTocOptions
 ): Promise<GenerateTocResult> {
 
   // Normalize ranges
@@ -139,7 +147,7 @@ export async function generateToc(
     onProgress?.(1, 1);
     const items = await fetchChunk(
       pageEntries.map(e => e.image),
-      apiKey, provider, doubaoEndpointIdText, doubaoEndpointIdVision
+      apiKey, provider, baseUrl, textModel, visionModel, customProviderName
     );
     return { items: Array.isArray(items) ? items : [], chunkFailures: [] };
   }
@@ -163,11 +171,11 @@ export async function generateToc(
 
     // First attempt
     try {
-      result = await fetchChunk(images, apiKey, provider, doubaoEndpointIdText, doubaoEndpointIdVision);
+      result = await fetchChunk(images, apiKey, provider, baseUrl, textModel, visionModel, customProviderName);
     } catch (_firstErr) {
       // Retry once
       try {
-        result = await fetchChunk(images, apiKey, provider, doubaoEndpointIdText, doubaoEndpointIdVision);
+        result = await fetchChunk(images, apiKey, provider, baseUrl, textModel, visionModel, customProviderName);
       } catch (retryErr: any) {
         chunkFailures.push({
           start: chunkStart,

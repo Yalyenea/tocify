@@ -7,24 +7,15 @@ import {
   normalizeToc,
 } from '$lib/utils/toc';
 
-export type Provider = 'gemini' | 'qwen' | 'doubao' | 'zhipu';
-
-export interface ModelOverrides {
-  geminiModel?: string;
-  qwenTextModel?: string;
-  qwenVisionModel?: string;
-  zhipuTextModel?: string;
-  zhipuVisionModel?: string;
-  doubaoTextModel?: string;
-  doubaoVisionModel?: string;
-}
+export type Provider = 'gemini' | 'qwen' | 'doubao' | 'zhipu' | 'custom';
 
 export interface DirectApiConfig {
   provider?: string;
   apiKey: string;
-  doubaoEndpointIdText?: string;
-  doubaoEndpointIdVision?: string;
-  modelOverrides?: ModelOverrides;
+  baseUrl?: string;
+  textModel?: string;
+  visionModel?: string;
+  customProviderName?: string;
 }
 
 export interface TocInputConfig extends DirectApiConfig {
@@ -54,13 +45,17 @@ export interface GraphResponse {
   }>;
 }
 
-const OPENAI_COMPAT_BASE_URL: Record<Exclude<Provider, 'gemini'>, string> = {
+const OPENAI_COMPAT_BASE_URL: Record<Exclude<Provider, 'gemini' | 'custom'>, string> = {
   qwen: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
   zhipu: 'https://open.bigmodel.cn/api/paas/v4',
   doubao: 'https://ark.cn-beijing.volces.com/api/v3',
 };
 
-function providerLabel(provider: Provider): string {
+function providerLabel(provider: Provider, config?: DirectApiConfig): string {
+  if (provider === 'custom') {
+    return config?.customProviderName?.trim() || 'Custom Provider';
+  }
+
   return provider.charAt(0).toUpperCase() + provider.slice(1);
 }
 
@@ -71,7 +66,13 @@ export function normalizeProvider(provider?: string): Provider | undefined {
     return undefined;
   }
 
-  if (normalized === 'gemini' || normalized === 'qwen' || normalized === 'doubao' || normalized === 'zhipu') {
+  if (
+    normalized === 'gemini' ||
+    normalized === 'qwen' ||
+    normalized === 'doubao' ||
+    normalized === 'zhipu' ||
+    normalized === 'custom'
+  ) {
     return normalized;
   }
 
@@ -132,43 +133,76 @@ function normalizeImageUrl(image: string): string {
   return `data:image/png;base64,${ image }`;
 }
 
-function getGeminiModel(config: DirectApiConfig): string {
-  return config.modelOverrides?.geminiModel || 'gemini-2.5-flash';
+function trimOptional(value?: string): string | undefined {
+  const trimmed = value?.trim();
+  return trimmed || undefined;
+}
+
+function getGeminiTextModel(config: DirectApiConfig): string {
+  return trimOptional(config.textModel) || 'gemini-2.5-flash';
+}
+
+function getGeminiVisionModel(config: DirectApiConfig): string {
+  return trimOptional(config.visionModel) || getGeminiTextModel(config);
+}
+
+function getOpenAiCompatBaseUrl(provider: Exclude<Provider, 'gemini'>, config: DirectApiConfig): string {
+  if (provider === 'custom') {
+    const baseUrl = trimOptional(config.baseUrl);
+    if (!baseUrl) {
+      throw new Error('Custom provider Base URL is required.');
+    }
+
+    return baseUrl.replace(/\/+$/, '');
+  }
+
+  return OPENAI_COMPAT_BASE_URL[provider];
 }
 
 function getOpenAiCompatTextModel(provider: Exclude<Provider, 'gemini'>, config: DirectApiConfig): string {
+  const model = trimOptional(config.textModel);
+  if (model) return model;
+
   switch (provider) {
     case 'qwen':
-      return config.modelOverrides?.qwenTextModel || 'qwen-plus';
+      return 'qwen-plus';
     case 'zhipu':
-      return config.modelOverrides?.zhipuTextModel || 'glm-4-flash';
+      return 'glm-4-flash';
     case 'doubao':
-      return config.doubaoEndpointIdText || config.modelOverrides?.doubaoTextModel || (() => {
-        throw new Error('Doubao text Endpoint ID is required.');
-      })();
+      throw new Error('Doubao text model or Endpoint ID is required.');
+    case 'custom':
+      throw new Error('Custom provider text model is required.');
   }
 }
 
 function getOpenAiCompatVisionModel(provider: Exclude<Provider, 'gemini'>, config: DirectApiConfig): string {
+  const model = trimOptional(config.visionModel);
+  if (model) return model;
+
   switch (provider) {
     case 'qwen':
-      return config.modelOverrides?.qwenVisionModel || 'qwen-vl-plus';
+      return 'qwen-vl-plus';
     case 'zhipu':
-      return config.modelOverrides?.zhipuVisionModel || 'glm-4v-flash';
+      return 'glm-4v-flash';
     case 'doubao':
-      return config.doubaoEndpointIdVision || config.modelOverrides?.doubaoVisionModel || (() => {
-        throw new Error('Doubao vision Endpoint ID is required.');
-      })();
+      throw new Error('Doubao vision model or Endpoint ID is required.');
+    case 'custom':
+      throw new Error('Custom provider vision model is required.');
   }
+}
+
+function getGeminiModelPath(model: string): string {
+  return model.startsWith('models/') ? model : `models/${ model }`;
 }
 
 async function fetchGeminiJson(
   apiKey: string,
+  model: string,
   body: Record<string, unknown>,
   fallbackMessage: string,
 ): Promise<string> {
   const response = await fetch(
-    'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent',
+    `https://generativelanguage.googleapis.com/v1beta/${ getGeminiModelPath(model) }:generateContent`,
     {
       method: 'POST',
       headers: {
@@ -188,12 +222,12 @@ async function fetchGeminiJson(
 }
 
 async function fetchOpenAiCompatJson(
-  provider: Exclude<Provider, 'gemini'>,
   apiKey: string,
+  baseUrl: string,
   body: Record<string, unknown>,
   fallbackMessage: string,
 ): Promise<string> {
-  const response = await fetch(`${ OPENAI_COMPAT_BASE_URL[provider] }/chat/completions`, {
+  const response = await fetch(`${ baseUrl }/chat/completions`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -216,6 +250,7 @@ async function requestTextJson(config: DirectApiConfig, systemPrompt: string, us
   if (provider === 'gemini') {
     return fetchGeminiJson(
       config.apiKey,
+      getGeminiTextModel(config),
       {
         systemInstruction: {
           parts: [{ text: systemPrompt }],
@@ -225,7 +260,7 @@ async function requestTextJson(config: DirectApiConfig, systemPrompt: string, us
           parts: [{ text: userText }],
         }],
       },
-      `${ providerLabel(provider) } request failed.`,
+      `${ providerLabel(provider, config) } request failed.`,
     );
   }
 
@@ -242,10 +277,10 @@ async function requestTextJson(config: DirectApiConfig, systemPrompt: string, us
   }
 
   return fetchOpenAiCompatJson(
-    provider,
     config.apiKey,
+    getOpenAiCompatBaseUrl(provider, config),
     textBody,
-    `${ providerLabel(provider) } request failed.`,
+    `${ providerLabel(provider, config) } request failed.`,
   );
 }
 
@@ -268,6 +303,7 @@ async function requestVisionJson(config: DirectApiConfig, systemPrompt: string, 
 
     return fetchGeminiJson(
       config.apiKey,
+      getGeminiVisionModel(config),
       {
         systemInstruction: {
           parts: [{ text: systemPrompt }],
@@ -280,7 +316,7 @@ async function requestVisionJson(config: DirectApiConfig, systemPrompt: string, 
           ],
         }],
       },
-      `${ providerLabel(provider) } request failed.`,
+      `${ providerLabel(provider, config) } request failed.`,
     );
   }
 
@@ -306,10 +342,10 @@ async function requestVisionJson(config: DirectApiConfig, systemPrompt: string, 
   }
 
   return fetchOpenAiCompatJson(
-    provider,
     config.apiKey,
+    getOpenAiCompatBaseUrl(provider, config),
     visionBody,
-    `${ providerLabel(provider) } request failed.`,
+    `${ providerLabel(provider, config) } request failed.`,
   );
 }
 
@@ -350,6 +386,7 @@ export async function generateBoard(tocItems: GraphNodeInput[], config: DirectAp
   const jsonText = provider === 'gemini'
     ? await fetchGeminiJson(
       config.apiKey,
+      getGeminiTextModel(config),
       {
         generationConfig: {
           responseMimeType: 'application/json',
@@ -359,11 +396,11 @@ export async function generateBoard(tocItems: GraphNodeInput[], config: DirectAp
           parts: [{ text: `${ SYSTEM_PROMPT_GRAPH }\n\nToC Data:\n${ tocText }` }],
         }],
       },
-      `${ providerLabel(provider) } request failed.`,
+      `${ providerLabel(provider, config) } request failed.`,
     )
     : await fetchOpenAiCompatJson(
-      provider,
       config.apiKey,
+      getOpenAiCompatBaseUrl(provider, config),
       {
         model: getOpenAiCompatTextModel(provider, config),
         ...(provider !== 'zhipu' && { max_completion_tokens: 4096 }),
@@ -372,7 +409,7 @@ export async function generateBoard(tocItems: GraphNodeInput[], config: DirectAp
           { role: 'user', content: `ToC Data:\n${ tocText }` },
         ],
       },
-      `${ providerLabel(provider) } request failed.`,
+      `${ providerLabel(provider, config) } request failed.`,
     );
 
   const aiData = parseJsonPayload<{

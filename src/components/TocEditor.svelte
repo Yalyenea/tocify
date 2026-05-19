@@ -31,8 +31,10 @@
   export let apiConfig = {
     provider: '',
     apiKey: '',
-    doubaoEndpointIdText: '',
-    doubaoEndpointIdVision: '',
+    baseUrl: '',
+    textModel: '',
+    visionModel: '',
+    customProviderName: '',
   };
   const dispatch = createEventDispatcher();
 
@@ -470,8 +472,10 @@
           text,
           apiKey: apiConfig.apiKey,
           provider: apiConfig.provider,
-          doubaoEndpointIdText: apiConfig.doubaoEndpointIdText,
-          doubaoEndpointIdVision: apiConfig.doubaoEndpointIdVision,
+          baseUrl: apiConfig.baseUrl,
+          textModel: apiConfig.textModel,
+          visionModel: apiConfig.visionModel,
+          customProviderName: apiConfig.customProviderName,
         });
       } else {
         const response = await fetch('/api/process-toc', {
@@ -481,6 +485,10 @@
             text: text,
             apiKey: apiConfig.apiKey,
             provider: apiConfig.provider,
+            baseUrl: apiConfig.baseUrl,
+            textModel: apiConfig.textModel,
+            visionModel: apiConfig.visionModel,
+            customProviderName: apiConfig.customProviderName,
           }),
         });
 

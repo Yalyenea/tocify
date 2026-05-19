@@ -77,7 +77,7 @@
     "generate_toc_ai": "从所选页面生成目录",
     "generating": "正在生成...",
     "go": "跳转",
-    "add_section": "添加新章节",
+    "add_chapter": "添加新章节",
     "upload_new": "上传新文件",
     "loading": "加载中...",
     "select_grid": "选择",
@@ -143,11 +143,25 @@
     "search_placeholder": "搜索章节...",
     "no_results": "找不到匹配的章节。"
   },
+  "save": {
+    "replace_source_confirm": "是否直接替换原位置的“{filename}”？选择取消将另存为副本。"
+  },
   "dropzone": {
     "drop_here": "将 PDF 文件拖放到此处...",
     "title": "上传你的 PDF",
     "subtitle": "将文件拖拽到此处或",
     "btn_select": "点击选择文件"
+  },
+  "help": {
+    "title": "如何使用 Tocify",
+    "step_upload_title": "加载 PDF",
+    "step_upload_desc": "将 PDF 拖入预览区，或从本地选择文件。",
+    "step_select_title": "选择目录页",
+    "step_select_desc": "在页面网格中拖动，标记包含目录的页面范围。",
+    "step_edit_title": "生成并编辑",
+    "step_edit_desc": "使用 AI 生成或手动编辑，再调整层级、标题、页码和样式。",
+    "step_export_title": "导出",
+    "step_export_desc": "预览生成结果后，导出完整 PDF 或选中的章节。"
   },
   "offset": {
     "title": "通过首个目录项校准页码偏移",
@@ -163,53 +177,6 @@
     "take_minutes": "这可能需要几分钟",
     "progress": "{current} / {total}",
     "partial_failure_title": "部分页面请求失败"
-  },
-  "client": {
-    "title": "在客户端运行",
-    "download_btn": "下载 Tocify",
-    "mac_hint": "如果应用提示已损坏，请在终端运行此命令。",
-    "byo_title": "使用自定义 API Key",
-    "report_issue": "反馈问题",
-    "btn_open": "客户端 App",
-    "btn_fold": "收起",
-    "copy_cmd": "复制命令",
-    "copied": "已复制",
-    "snooze": "不再展示"
-  },
-  "seo": {
-    "why_title": "为什么选择 Tocify?",
-    "why_desc": "Tocify 是开源/免费/在线的 PDF 目录或书签添加/编辑/生成工具，它完全基于浏览器运行。无论您有扫描文档还是电子书，我们的 AI 驱动解决方案都能在几分钟内格式化并插入书签，或生成实体可点击的目录，让您的 PDF 易于导航。",
-    "features_title": "核心功能",
-    "feature_1_title": "AI 智能生成",
-    "feature_1_desc": "自动从扫描页面检测并格式化目录结构。",
-    "feature_2_title": "拖拽编辑",
-    "feature_2_desc": "通过直观的拖拽界面轻松组织章节。",
-    "feature_3_title": "隐私至上",
-    "feature_3_desc": "文件在浏览器本地处理，数据不会上传到服务器。",
-    "how_title": "如何生成 PDF 目录",
-    "how_step_1": "上传您的 PDF 文件。",
-    "how_step_2": "选择包含目录的页面范围。",
-    "how_step_3": "点击“生成”让 AI 提取结构。",
-    "how_step_4": "如有需要可手动编辑，然后导出新 PDF。",
-    "faq_title": "常见问题",
-    "faq_1_q": "Tocify 是免费的吗？",
-    "faq_1_a": "是的，Tocify 完全免费使用。",
-    "faq_2_q": "我的数据安全吗？",
-    "faq_2_a": "安全。我们使用浏览器能力在本地处理文件。你的文档永远不会离开设备。",
-    "faq_3_q": "Tocify 支持哪些 model?",
-    "faq_3_a": "Tocify 支持多种模型，你需要自带 API Key (Bring Your Own API Keys)。<br><br>目前支持：<br>• <b>Gemini</b>: <a href='https://aistudio.google.com/app/apikey' target='_blank' class='text-blue-600 hover:underline'>Get Key</a><br>• <b>Qwen (通义千问)</b>: <a href='https://bailian.console.aliyun.com/?tab=model#/api-key' target='_blank' class='text-blue-600 hover:underline'>Get Key</a><br>• <b>Doubao (豆包)</b>: <a href='https://www.volcengine.com/docs/82379/1541594?lang=zh' target='_blank' class='text-blue-600 hover:underline'>Get Key</a><br>• <b>Zhipu (智谱)</b>: <a href='https://open.bigmodel.cn/usercenter/apikeys' target='_blank' class='text-blue-600 hover:underline'>Get Key</a>",
-    "faq_4_q": "Tocify 是否可以在客户端运行？",
-    "faq_4_a": "是的，我们提供 <b>macOS</b> 和 <b>Windows</b> 客户端。<br>您可以前往 GitHub Releases 页面下载：<br><a href='https://github.com/anig1scur/tocify/releases' target='_blank' class='text-blue-600 hover:underline'>Download Releases</a>",
-    "faq_5_q": "Tocify 支持哪些快捷键？",
-    "faq_5_a": "• <b>Ctrl/Cmd + Z</b>: 撤销<br>• <b>Ctrl/Cmd + Shift + Z</b>: 重做 (撤销撤销)<br>• <b>单击圆点或空白区域</b>: 选中目录项<br>• <b>Shift + 单击</b>: 区间选择目录项<br>• <b>上下键</b>: 快速切换 导航输入框<br>• <b>拖动拖拽柄</b>: 拖拽目录项 / 目录组"
-  },
-  "star_request": {
-    "title": "喜欢 Tocify 吗？",
-    "body": "如果这个工具对你有帮助，请考虑在 GitHub 上给我们一个 star，或者分享你的反馈建议！",
-    "btn_star": "去 GitHub 给 Star",
-    "btn_feedback": "反馈建议",
-    "btn_maybe_later": "以后再说",
-    "btn_dont_show": "不再展示"
   },
   "knowledge_board": {
     "title": "知识看板",
@@ -257,6 +224,7 @@
     "load_pdf_first": "请先加载 PDF 文件",
     "no_valid_toc": "未能在所选页面中找到有效的目录",
     "error_generating_toc": "AI 生成目录出错：{msg}",
+    "source_replace_denied": "未获得原文件写入权限。",
     "unknown_async_error": "未知异步错误",
     "unknown_error": "未知错误"
   }

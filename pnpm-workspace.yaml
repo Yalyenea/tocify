@@ -1,2 +1,2 @@
-patchedDependencies:
-  pdf-lib: patches/pdf-lib.patch
+packages:
+  - '.'

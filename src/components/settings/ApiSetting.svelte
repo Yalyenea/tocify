@@ -2,7 +2,7 @@
   import {createEventDispatcher, onMount} from 'svelte';
   import {slide} from 'svelte/transition';
   import {t} from 'svelte-i18n';
-  import {ExternalLink, Eye, EyeOff, KeyRound, Sparkles} from 'lucide-svelte';
+  import {Bot, ExternalLink, Eye, EyeOff, KeyRound, Link, ScanText, Sparkles} from 'lucide-svelte';
 
   export let isExpanded = false;
 
@@ -11,8 +11,10 @@
   let config = {
     provider: '',
     apiKey: '',
-    doubaoEndpointIdText: '',
-    doubaoEndpointIdVision: '',
+    baseUrl: '',
+    textModel: '',
+    visionModel: '',
+    customProviderName: '',
   };
 
   let isSaved = false;
@@ -36,13 +38,48 @@
     },
   };
 
+  const providerDefaults = {
+    gemini: {
+      textModel: 'gemini-2.5-flash',
+      visionModel: 'gemini-2.5-flash',
+      baseUrl: '',
+      customProviderName: '',
+    },
+    qwen: {
+      textModel: 'qwen-plus',
+      visionModel: 'qwen-vl-plus',
+      baseUrl: '',
+      customProviderName: '',
+    },
+    doubao: {
+      textModel: '',
+      visionModel: '',
+      baseUrl: '',
+      customProviderName: '',
+    },
+    zhipu: {
+      textModel: 'glm-4-flash',
+      visionModel: 'glm-4v-flash',
+      baseUrl: '',
+      customProviderName: '',
+    },
+    custom: {
+      textModel: '',
+      visionModel: '',
+      baseUrl: '',
+      customProviderName: '',
+    },
+  };
+
   function getEffectiveConfig() {
     if (!config.provider) {
       return {
         provider: '',
         apiKey: '',
-        doubaoEndpointIdText: '',
-        doubaoEndpointIdVision: '',
+        baseUrl: '',
+        textModel: '',
+        visionModel: '',
+        customProviderName: '',
       };
     }
 
@@ -57,11 +94,24 @@
     return [];
   }
 
+  function handleProviderChange() {
+    const defaults = providerDefaults[config.provider as keyof typeof providerDefaults];
+
+    config = {
+      ...config,
+      baseUrl: defaults?.baseUrl || '',
+      textModel: defaults?.textModel || '',
+      visionModel: defaults?.visionModel || '',
+      customProviderName: defaults?.customProviderName || '',
+    };
+    isSaved = false;
+  }
+
   onMount(() => {
     const savedConfig = localStorage.getItem('tocify_api_config');
     if (savedConfig) {
       try {
-        config = JSON.parse(savedConfig);
+        config = {...config, ...JSON.parse(savedConfig)};
         dispatch('change', getEffectiveConfig());
       } catch (e) {
         console.error('Failed to parse api config', e);
@@ -130,13 +180,14 @@
               id="llm_provider"
               class="w-full bg-white outline-none text-sm"
               bind:value={config.provider}
-              on:change={() => (isSaved = false)}
+              on:change={handleProviderChange}
             >
               <option value="">Auto</option>
               <option value="gemini">Gemini</option>
               <option value="qwen">Qwen</option>
               <option value="doubao">Doubao</option>
               <option value="zhipu">Zhipu</option>
+              <option value="custom">Custom OpenAI-compatible</option>
             </select>
 
             {#each getVisibleProviderLinks() as providerLink}
@@ -153,21 +204,23 @@
           </div>
         </div>
 
-        {#if config.provider === 'doubao'}
+        {#if config.provider === 'custom'}
           <div
             class="border-black border-2 rounded-md p-2 w-full"
             transition:slide={{duration: 200}}
           >
             <label
-              class="block font-bold mb-1 text-sm"
-              for="doubao_ep_text">Endpoint ID (Text/Lite)</label
+              class="flex items-center gap-1.5 font-bold mb-1 text-sm"
+              for="custom_provider_name">
+              <Bot size={14} strokeWidth={3} />
+              Provider Name</label
             >
             <input
-              id="doubao_ep_text"
+              id="custom_provider_name"
               type="text"
               class="w-full outline-none text-sm placeholder-gray-400"
-              placeholder="ep-..."
-              bind:value={config.doubaoEndpointIdText}
+              placeholder="My Provider"
+              bind:value={config.customProviderName}
               on:input={() => (isSaved = false)}
             />
           </div>
@@ -177,21 +230,61 @@
             transition:slide={{duration: 200}}
           >
             <label
-              class="block font-bold mb-1 text-sm"
-              for="doubao_ep_vision">Endpoint ID (Vision/Pro)</label
+              class="flex items-center gap-1.5 font-bold mb-1 text-sm"
+              for="custom_base_url">
+              <Link size={14} strokeWidth={3} />
+              Base URL</label
             >
             <input
-              id="doubao_ep_vision"
-              type="text"
+              id="custom_base_url"
+              type="url"
               class="w-full outline-none text-sm placeholder-gray-400"
-              placeholder="ep-..."
-              bind:value={config.doubaoEndpointIdVision}
+              placeholder="https://api.example.com/v1"
+              bind:value={config.baseUrl}
               on:input={() => (isSaved = false)}
             />
           </div>
         {/if}
 
         {#if config.provider}
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div class="border-black border-2 rounded-md p-2 w-full">
+              <label
+                class="flex items-center gap-1.5 font-bold mb-1 text-sm"
+                for="text_model"
+              >
+                <Bot size={14} strokeWidth={3} />
+                Text / Graph Model
+              </label>
+              <input
+                id="text_model"
+                type="text"
+                class="w-full outline-none text-sm placeholder-gray-400"
+                placeholder={config.provider === 'doubao' ? 'ep-...' : 'model name'}
+                bind:value={config.textModel}
+                on:input={() => (isSaved = false)}
+              />
+            </div>
+
+            <div class="border-black border-2 rounded-md p-2 w-full">
+              <label
+                class="flex items-center gap-1.5 font-bold mb-1 text-sm"
+                for="vision_model"
+              >
+                <ScanText size={14} strokeWidth={3} />
+                OCR / Vision Model
+              </label>
+              <input
+                id="vision_model"
+                type="text"
+                class="w-full outline-none text-sm placeholder-gray-400"
+                placeholder={config.provider === 'doubao' ? 'ep-...' : 'model name'}
+                bind:value={config.visionModel}
+                on:input={() => (isSaved = false)}
+              />
+            </div>
+          </div>
+
           <div class="border-black border-2 rounded-md p-2 w-full">
             <label
               class="flex items-center gap-1.5 font-bold mb-1 text-sm"

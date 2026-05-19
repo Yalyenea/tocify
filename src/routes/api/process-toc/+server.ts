@@ -4,8 +4,9 @@ import { error, json } from '@sveltejs/kit';
 
 export const POST = withRateLimit(async ({ request }) => {
   const origin = request.headers.get('origin');
+  const requestOrigin = new URL(request.url).origin;
   const allowedOrigins = [
-    'https://tocify.aeriszhu.com', 'https://tocify.vercel.app',
+    requestOrigin,
     'http://localhost:5173', 'http://127.0.0.1:5173'
   ];
 
@@ -14,7 +15,18 @@ export const POST = withRateLimit(async ({ request }) => {
   }
 
   try {
-    const { images, text, apiKey, provider, doubaoEndpointIdText, doubaoEndpointIdVision } = await request.json();
+    const {
+      images,
+      text,
+      apiKey,
+      provider,
+      baseUrl,
+      textModel,
+      visionModel,
+      customProviderName,
+      doubaoEndpointIdText,
+      doubaoEndpointIdVision,
+    } = await request.json();
 
     if ((!images || !Array.isArray(images) || images.length === 0) &&
       (!text || typeof text !== 'string' || !text.trim())) {
@@ -40,6 +52,10 @@ export const POST = withRateLimit(async ({ request }) => {
       text,
       apiKey,
       provider,
+      baseUrl,
+      textModel,
+      visionModel,
+      customProviderName,
       doubaoEndpointIdText,
       doubaoEndpointIdVision,
     });

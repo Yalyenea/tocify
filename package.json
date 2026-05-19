@@ -2,7 +2,16 @@
 	"name": "tocify",
 	"private": true,
 	"version": "0.0.1",
+	"packageManager": "pnpm@9.15.9",
 	"type": "module",
+	"engines": {
+		"node": ">=22"
+	},
+	"pnpm": {
+		"patchedDependencies": {
+			"pdf-lib@1.17.1": "patches/pdf-lib.patch"
+		}
+	},
 	"scripts": {
 		"dev": "vite dev --host",
 		"build": "vite build",
@@ -12,7 +21,7 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
 	},
 	"devDependencies": {
-		"@sveltejs/adapter-static": "^3.0.8",
+		"@sveltejs/adapter-vercel": "^6.1.1",
 		"@sveltejs/kit": "^2.16.0",
 		"@sveltejs/vite-plugin-svelte": "^5.0.0",
 		"@tailwindcss/typography": "^0.5.16",
@@ -25,15 +34,10 @@
 		"vite": "^6.0.0"
 	},
 	"dependencies": {
-		"@aptabase/web": "^0.4.3",
-		"@google/generative-ai": "^0.24.1",
-		"@sveltejs/adapter-vercel": "^6.1.1",
 		"@upstash/ratelimit": "^2.0.7",
 		"@upstash/redis": "^1.36.0",
-		"@vercel/analytics": "^1.5.0",
 		"jsonrepair": "^3.13.1",
 		"lucide-svelte": "^0.474.0",
-		"openai": "^6.15.0",
 		"pdf-fontkit": "^1.8.9",
 		"pdf-lib": "^1.17.1",
 		"roughjs": "^4.6.6",

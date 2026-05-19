@@ -18,7 +18,7 @@
 
   <div class="flex items-center gap-2 pt-2">
     <a
-      href="https://github.com/anig1scur/tocify"
+      href="https://github.com/Yalyenea/tocify"
       target="_blank"
       rel="noopener noreferrer"
       class="text-black hover:text-gray-700 transition-colors"

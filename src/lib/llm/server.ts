@@ -40,11 +40,51 @@ function resolveApiKey(provider: Provider, userKey?: string): string {
       return env.ZHIPU_API_KEY || '';
     case 'doubao':
       return env.DOUBAO_API_KEY || '';
+    case 'custom':
+      return env.CUSTOM_API_KEY || '';
   }
 }
 
 function providerLabel(provider: Provider): string {
+  if (provider === 'custom') {
+    return env.CUSTOM_PROVIDER_NAME || 'Custom Provider';
+  }
+
   return provider.charAt(0).toUpperCase() + provider.slice(1);
+}
+
+function resolveTextModel(provider: Provider, userModel?: string, doubaoEndpointIdText?: string): string | undefined {
+  if (userModel) return userModel;
+
+  switch (provider) {
+    case 'gemini':
+      return env.GEMINI_MODEL;
+    case 'qwen':
+      return env.QWEN_TEXT_MODEL;
+    case 'zhipu':
+      return env.ZHIPU_TEXT_MODEL;
+    case 'doubao':
+      return doubaoEndpointIdText || env.DOUBAO_TEXT_MODEL || env.DOUBAO_ENDPOINT_ID_TEXT;
+    case 'custom':
+      return env.CUSTOM_TEXT_MODEL;
+  }
+}
+
+function resolveVisionModel(provider: Provider, userModel?: string, doubaoEndpointIdVision?: string): string | undefined {
+  if (userModel) return userModel;
+
+  switch (provider) {
+    case 'gemini':
+      return env.GEMINI_VISION_MODEL || env.GEMINI_MODEL;
+    case 'qwen':
+      return env.QWEN_VISION_MODEL || env.QWEN_VL_MODEL;
+    case 'zhipu':
+      return env.ZHIPU_VISION_MODEL;
+    case 'doubao':
+      return doubaoEndpointIdVision || env.DOUBAO_VISION_MODEL || env.DOUBAO_ENDPOINT_ID_VISION;
+    case 'custom':
+      return env.CUSTOM_VISION_MODEL;
+  }
 }
 
 export async function processTocOnServer({
@@ -53,6 +93,10 @@ export async function processTocOnServer({
   text,
   apiKey,
   provider,
+  baseUrl,
+  textModel,
+  visionModel,
+  customProviderName,
   doubaoEndpointIdText,
   doubaoEndpointIdVision,
 }: {
@@ -61,6 +105,10 @@ export async function processTocOnServer({
   text?: string;
   apiKey?: string;
   provider?: string;
+  baseUrl?: string;
+  textModel?: string;
+  visionModel?: string;
+  customProviderName?: string;
   doubaoEndpointIdText?: string;
   doubaoEndpointIdVision?: string;
 }) {
@@ -74,19 +122,12 @@ export async function processTocOnServer({
   return processToc({
     provider: resolvedProvider,
     apiKey: resolvedApiKey,
+    baseUrl: baseUrl || env.CUSTOM_BASE_URL,
     images,
     text,
-    doubaoEndpointIdText: doubaoEndpointIdText || env.DOUBAO_ENDPOINT_ID_TEXT,
-    doubaoEndpointIdVision: doubaoEndpointIdVision || env.DOUBAO_ENDPOINT_ID_VISION,
-    modelOverrides: {
-      geminiModel: 'gemini-2.5-flash',
-      qwenVisionModel: env.QWEN_VL_MODEL || 'qwen-vl-plus',
-      qwenTextModel: 'qwen-plus',
-      zhipuTextModel: 'glm-4-flash',
-      zhipuVisionModel: 'glm-4v-flash',
-      doubaoTextModel: env.DOUBAO_ENDPOINT_ID_TEXT,
-      doubaoVisionModel: env.DOUBAO_ENDPOINT_ID_VISION,
-    },
+    textModel: resolveTextModel(resolvedProvider, textModel, doubaoEndpointIdText),
+    visionModel: resolveVisionModel(resolvedProvider, visionModel, doubaoEndpointIdVision),
+    customProviderName: customProviderName || env.CUSTOM_PROVIDER_NAME,
   });
 }
 
@@ -95,12 +136,18 @@ export async function generateBoardOnServer({
   tocItems,
   apiKey,
   provider,
+  baseUrl,
+  textModel,
+  customProviderName,
   doubaoEndpointIdText,
 }: {
   request: Request;
   tocItems: GraphNodeInput[];
   apiKey?: string;
   provider?: string;
+  baseUrl?: string;
+  textModel?: string;
+  customProviderName?: string;
   doubaoEndpointIdText?: string;
 }) {
   const resolvedProvider = determineProvider(request, provider);
@@ -113,12 +160,8 @@ export async function generateBoardOnServer({
   return generateBoard(tocItems, {
     provider: resolvedProvider,
     apiKey: resolvedApiKey,
-    doubaoEndpointIdText: doubaoEndpointIdText || env.DOUBAO_ENDPOINT_ID_TEXT,
-    modelOverrides: {
-      geminiModel: 'gemini-2.5-flash',
-      qwenTextModel: 'qwen-plus',
-      zhipuTextModel: 'glm-4-flash',
-      doubaoTextModel: env.DOUBAO_ENDPOINT_ID_TEXT,
-    },
+    baseUrl: baseUrl || env.CUSTOM_BASE_URL,
+    textModel: resolveTextModel(resolvedProvider, textModel, doubaoEndpointIdText),
+    customProviderName: customProviderName || env.CUSTOM_PROVIDER_NAME,
   });
 }

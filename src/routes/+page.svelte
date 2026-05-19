@@ -3,9 +3,7 @@
   import {get} from 'svelte/store';
   import {fade, fly} from 'svelte/transition';
   import {t, isLoading} from 'svelte-i18n';
-  import {injectAnalytics} from '@vercel/analytics/sveltekit';
   import type * as PdfjsLibTypes from 'pdfjs-dist';
-  import {init, trackEvent} from '@aptabase/web';
 
   import '../lib/i18n';
   import {pdfService, tocItems, curFileFingerprint, tocConfig, autoSaveEnabled, type TocConfig} from '../stores';
@@ -30,23 +28,17 @@
   import {setPageLabels} from '$lib/pdf/page-labels';
 
   import Toast from '../components/Toast.svelte';
-  import Footer from '../components/Footer.svelte';
 
   import AiLoadingModal from '../components/modals/AiLoadingModal.svelte';
   import OffsetModal from '../components/modals/OffsetModal.svelte';
   import HelpModal from '../components/modals/HelpModal.svelte';
   import ChapterExportModal from '../components/modals/ChapterExportModal.svelte';
-  import StarRequestModal from '../components/modals/StarRequestModal.svelte';
 
-  import DownloadBanner from '../components/DownloadBanner.svelte';
   import SidebarPanel from '../components/panels/SidebarPanel.svelte';
   import PreviewPanel from '../components/panels/PreviewPanel.svelte';
-  import SeoJsonLd from '../components/SeoJsonLd.svelte';
 
   import TocRelation from '../components/KnowledgeBoard.svelte';
   import {ChevronRight, ChevronLeft} from 'lucide-svelte';
-
-  injectAnalytics();
 
   const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
   const TWO_SECONDS = 2000;
@@ -71,7 +63,6 @@
   let showOffsetModal = false;
   let showHelpModal = false;
   let showChapterExportModal = false;
-  let showStarRequestModal = false;
   let offsetPreviewPageNum = 1;
   let selectedChapterExportIds: string[] = [];
   let chapterExportMode: 'merge' | 'separate' = 'merge';
@@ -120,21 +111,12 @@
   let customApiConfig = {
     provider: '',
     apiKey: '',
-    doubaoEndpointIdText: '',
-    doubaoEndpointIdVision: '',
+    baseUrl: '',
+    textModel: '',
+    visionModel: '',
+    customProviderName: '',
   };
   let tocEditor: any;
-
-  onMount(async () => {
-    init('A-US-0422911470', {
-      appVersion: '1.0.0',
-    });
-
-    trackEvent('app_started', {
-      platform: 'web',
-      version: '1.0.0',
-    });
-  });
 
   onMount(() => {
     $pdfService = new PDFService();
@@ -200,23 +182,83 @@
     }));
   }
 
-  async function savePdfBytes(pdfBytes: Uint8Array, suggestedName: string, preferSavePicker = true) {
+  type FileSystemPermissionDescriptor = {mode?: 'read' | 'readwrite'};
+  type FileSystemWritableLike = {
+    write: (data: BufferSource | Blob | string) => Promise<void>;
+    close: () => Promise<void>;
+  };
+  type FileSystemFileHandleLike = {
+    name?: string;
+    getFile: () => Promise<File>;
+    createWritable: () => Promise<FileSystemWritableLike>;
+    queryPermission?: (descriptor?: FileSystemPermissionDescriptor) => Promise<PermissionState>;
+    requestPermission?: (descriptor?: FileSystemPermissionDescriptor) => Promise<PermissionState>;
+  };
+  type PdfFileSelection = {
+    file: File;
+    handle?: FileSystemFileHandleLike | null;
+  };
+  type SavePdfOptions = {
+    preferSavePicker?: boolean;
+    replaceSource?: boolean;
+  };
+
+  const pdfSaveTypes = [
+    {
+      description: 'PDF Document',
+      accept: {'application/pdf': ['.pdf']},
+    },
+  ];
+
+  let sourceFileHandle: FileSystemFileHandleLike | null = null;
+
+  async function requestWritablePermission(fileHandle: FileSystemFileHandleLike) {
+    const descriptor: FileSystemPermissionDescriptor = {mode: 'readwrite'};
+
+    if (fileHandle.requestPermission) {
+      return await fileHandle.requestPermission(descriptor) === 'granted';
+    }
+
+    if (fileHandle.queryPermission) {
+      return await fileHandle.queryPermission(descriptor) === 'granted';
+    }
+
+    return true;
+  }
+
+  async function writePdfToHandle(fileHandle: FileSystemFileHandleLike, pdfBytes: Uint8Array) {
+    const writable = await fileHandle.createWritable();
+    await writable.write(pdfBytes);
+    await writable.close();
+  }
+
+  async function savePdfBytes(pdfBytes: Uint8Array, suggestedName: string, options: SavePdfOptions | boolean = {}) {
+    const {preferSavePicker = true, replaceSource = false} = typeof options === 'boolean'
+      ? {preferSavePicker: options}
+      : options;
+
+    if (replaceSource && sourceFileHandle) {
+      await writePdfToHandle(sourceFileHandle, pdfBytes);
+      return true;
+    }
+
     const isSupported = preferSavePicker && 'showSaveFilePicker' in window;
 
     if (isSupported) {
       try {
-        const fileHandle = await (window as any).showSaveFilePicker({
+        const savePickerOptions: any = {
+          id: 'tocify-pdf-output',
           suggestedName,
-          types: [
-            {
-              description: 'PDF Document',
-              accept: {'application/pdf': ['.pdf']},
-            },
-          ],
-        });
-        const writable = await fileHandle.createWritable();
-        await writable.write(pdfBytes);
-        await writable.close();
+          types: pdfSaveTypes,
+          excludeAcceptAllOption: true,
+        };
+
+        if (sourceFileHandle) {
+          savePickerOptions.startIn = sourceFileHandle;
+        }
+
+        const fileHandle = await (window as any).showSaveFilePicker(savePickerOptions);
+        await writePdfToHandle(fileHandle, pdfBytes);
         return true;
       } catch (err: any) {
         if (err.name === 'AbortError') return false;
@@ -235,6 +277,14 @@
     document.body.removeChild(link);
     setTimeout(() => URL.revokeObjectURL(url), 1000);
     return true;
+  }
+
+  function normalizePdfFileSelection(selection: File | PdfFileSelection): PdfFileSelection {
+    if (selection instanceof File) {
+      return {file: selection, handle: null};
+    }
+
+    return selection;
   }
 
   // Only trigger updatePDF when config content actually changes, not just reference
@@ -573,9 +623,11 @@
     }
   };
 
-  const loadPdfFile = async (file: File) => {
+  const loadPdfFile = async (selection: File | PdfFileSelection) => {
+    const {file, handle} = normalizePdfFileSelection(selection);
     if (!file) return;
 
+    sourceFileHandle = handle || null;
     renderQueue.clear();
 
     const fingerprint = `${file.name}_${file.size}`;
@@ -726,8 +778,16 @@
 
   const exportPDF = async () => {
     try {
-      toastProps = {show: true, message: $t('toast.exporting'), type: 'info'};
+      const shouldReplaceSource = !!sourceFileHandle && window.confirm(
+        $t('save.replace_source_confirm', {values: {filename: pdfState.filename}}),
+      );
 
+      if (shouldReplaceSource && sourceFileHandle && !await requestWritablePermission(sourceFileHandle)) {
+        toastProps = {show: true, message: $t('toast.source_replace_denied'), type: 'error'};
+        return;
+      }
+
+      toastProps = {show: true, message: $t('toast.exporting'), type: 'info'};
       await updatePDF(true);
       if (!pdfState.newDoc) {
         toastProps = {show: true, message: $t('toast.no_pdf_to_export'), type: 'error'};
@@ -735,23 +795,13 @@
       }
       const pdfBytes = await pdfState.newDoc.save();
 
-      const saved = await savePdfBytes(
-        pdfBytes,
-        pdfState.filename.replace('.pdf', '_outlined.pdf'),
-      );
+      const saved = await savePdfBytes(pdfBytes, pdfState.filename.replace('.pdf', '_outlined.pdf'), {
+        replaceSource: shouldReplaceSource,
+      });
       if (!saved) {
         return;
       }
       toastProps = {show: true, message: $t('toast.export_success'), type: 'success'};
-
-      setTimeout(() => {
-        const isDismissed = localStorage.getItem('tocify_hide_star_request') === 'true';
-        if (!isDismissed) {
-          if (Math.random() <= 0.1) {
-            showStarRequestModal = true;
-          }
-        }
-      }, 1000);
     } catch (error: any) {
       console.error('Error exporting PDF:', error);
       toastProps = {show: true, message: $t('toast.error_exporting', {values: {msg: error.message}}), type: 'error'};
@@ -872,8 +922,10 @@
         ranges: tocRanges,
         apiKey: customApiConfig.apiKey,
         provider: customApiConfig.provider,
-        doubaoEndpointIdText: customApiConfig.doubaoEndpointIdText,
-        doubaoEndpointIdVision: customApiConfig.doubaoEndpointIdVision,
+        baseUrl: customApiConfig.baseUrl,
+        textModel: customApiConfig.textModel,
+        visionModel: customApiConfig.visionModel,
+        customProviderName: customApiConfig.customProviderName,
         onProgress: (current, total) => {
           aiProgress = { current, total };
         },
@@ -1159,8 +1211,6 @@
   {/if}
 </div>
 
-<DownloadBanner />
-
 {#if toastProps.show}
   <Toast
     message={toastProps.message}
@@ -1251,10 +1301,6 @@
     />
   </div>
 
-  <Footer />
-
-  <SeoJsonLd title={$t('meta.title')} />
-
   <AiLoadingModal
     {isAiLoading}
     {tocRanges}
@@ -1279,8 +1325,6 @@
     chapters={chapterExportItems}
     on:confirm={exportSelectedChapters}
   />
-
-  <StarRequestModal bind:show={showStarRequestModal} />
 {/if}
 
 <svelte:window on:beforeunload={handleBeforeUnload} />

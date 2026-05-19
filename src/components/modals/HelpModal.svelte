@@ -1,21 +1,9 @@
 <script lang="ts">
   import {fade, fly} from 'svelte/transition';
-  import {X, Send} from 'lucide-svelte';
+  import {X} from 'lucide-svelte';
+  import {t} from 'svelte-i18n';
 
   export let showHelpModal: boolean;
-
-  const email = 'anigiscur@gmail.com';
-  let copied = false;
-
-  const copyEmail = async () => {
-    try {
-      await navigator.clipboard.writeText(email);
-      copied = true;
-      setTimeout(() => (copied = false), 2000);
-    } catch (err) {
-      console.error('Failed to copy', err);
-    }
-  };
 </script>
 
 {#if showHelpModal}
@@ -31,33 +19,7 @@
     >
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div class="flex flex-wrap items-center gap-4">
-          <h2 class="text-2xl font-black italic">How to Use Tocify</h2>
-
-          <span class=" font-bold border-l-2 border-black pl-4 ml-1 hidden sm:inline-block">
-            Feedback
-            <Send
-              size={18}
-              class="inline-block font-bold mr-1"
-            />
-          </span>
-
-          <button
-            on:click={copyEmail}
-            class=" relative overflow-hidden group flex items-center gap-2 px-3 py-1.5
-              text-xs font-bold uppercase tracking-wider
-              border-2 border-black rounded-md
-              {copied
-              ? 'bg-lime-400 text-black border-black cursor-default'
-              : 'bg-white text-black hover:bg-yellow-400 hover:text-black active:scale-95'}
-            "
-            title="Click to copy email"
-          >
-            {#if copied}
-              <span>COPIED!</span>
-            {:else}
-              <span>{email}</span>
-            {/if}
-          </button>
+          <h2 class="text-2xl font-black italic">{$t('help.title')}</h2>
         </div>
 
         <button
@@ -72,16 +34,24 @@
         </button>
       </div>
 
-      <div class="flex flex-col gap-6">
-        <video
-          src={'/videos/demo.mp4'}
-          controls
-          loop
-          autoplay
-          muted
-          class="w-full h-auto rounded-md"
-        ></video>
-      </div>
+      <ol class="grid gap-4 md:grid-cols-2">
+        <li class="border-2 border-black rounded-lg p-4 bg-yellow-50">
+          <h3 class="font-black mb-2">1. {$t('help.step_upload_title')}</h3>
+          <p class="text-sm leading-6 text-gray-700">{$t('help.step_upload_desc')}</p>
+        </li>
+        <li class="border-2 border-black rounded-lg p-4 bg-blue-50">
+          <h3 class="font-black mb-2">2. {$t('help.step_select_title')}</h3>
+          <p class="text-sm leading-6 text-gray-700">{$t('help.step_select_desc')}</p>
+        </li>
+        <li class="border-2 border-black rounded-lg p-4 bg-green-50">
+          <h3 class="font-black mb-2">3. {$t('help.step_edit_title')}</h3>
+          <p class="text-sm leading-6 text-gray-700">{$t('help.step_edit_desc')}</p>
+        </li>
+        <li class="border-2 border-black rounded-lg p-4 bg-pink-50">
+          <h3 class="font-black mb-2">4. {$t('help.step_export_title')}</h3>
+          <p class="text-sm leading-6 text-gray-700">{$t('help.step_export_desc')}</p>
+        </li>
+      </ol>
     </div>
   </div>
 {/if}

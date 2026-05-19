@@ -1,9 +1,12 @@
 <script lang="ts">
+  import {createEventDispatcher} from 'svelte';
   import {Upload} from 'lucide-svelte';
   import {t} from 'svelte-i18n';
 
   export let isDragging: boolean;
   export let hasInstance: boolean;
+
+  const dispatch = createEventDispatcher();
 </script>
 
 <div
@@ -25,6 +28,8 @@
         <h3 class="text-2xl font-bold text-black mb-5">{$t('dropzone.title')}</h3>
         <p class="text-lg">{$t('dropzone.subtitle')}</p>
         <button
+          type="button"
+          on:click|preventDefault|stopPropagation={() => dispatch('openfile')}
           class="btn mt-4 font-bold bg-blue-400 text-black border-2 border-black rounded-lg px-6 py-3 shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all"
         >
           {$t('dropzone.btn_select')}

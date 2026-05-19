@@ -1,35 +1,34 @@
-<h1>
-  Tocify
-  <img src="https://raw.githubusercontent.com/anig1scur/tocify/refs/heads/main/static/favicon.svg" width="36" />
-</h1>
+# Tocify
 
-Tocify is a free, online and open-source web application to add, edit, or generate Table of Contents (ToCs) / bookmarks for PDFs. It uses AI to parse scanned directory images or raw text into structured outlines, and creates clickable bookmarks & printable TOC pages for PDFs in cross platforms.
+Tocify 是一个 SvelteKit PDF 工具，用于提取、编辑和写入 PDF 目录 / 书签，并支持生成实体目录页、章节导出和基于目录的知识看板。
 
-</div>
+这个 fork 已清理上游宣传、SEO、站点验证、统计和演示素材，保留面向本地维护的核心应用与开发文档。
 
+## 快速开始
 
-## Usage
+```sh
+pnpm install
+just dev
+```
 
+常用命令：
 
-<https://github.com/user-attachments/assets/48e09103-f3a8-4d13-afeb-d11b5c8ade44>
+```sh
+just check
+just build
+just preview
+```
 
----
+## 文档
 
-### 1. Basic
+- [开发说明](docs/development.md)
+- [架构说明](docs/architecture.md)
+- [验证与测试](docs/testing.md)
+- [变更记录](CHANGELOG.md)
 
-<img src="./screenshots/basic.png" alt="Basic" width="100%"/>
+## 技术栈
 
-### 2. Format text
-
-<img src="./screenshots/text.gif" alt="Format text" width="100%"/>
-
-### 3. Edit style
-
-<img src="./screenshots/style.png" alt="Edit style" width="100%"/>
-
-
-## Support me
-
-You can support me by Alipay (scan QR code below) or [ko-fi](https://ko-fi.com/aerisz):
-
-![](./screenshots/support.webp)
+- SvelteKit / Svelte 5 / TypeScript / Vite
+- Tailwind CSS
+- pdf.js / pdf-lib
+- Gemini、Qwen、Doubao、Zhipu 兼容的 LLM 目录解析
