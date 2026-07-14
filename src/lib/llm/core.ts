@@ -18,6 +18,11 @@ export interface DirectApiConfig {
   customProviderName?: string;
 }
 
+export interface ProviderModel {
+  id: string;
+  label: string;
+}
+
 export interface TocInputConfig extends DirectApiConfig {
   images?: string[];
   text?: string;
@@ -242,6 +247,59 @@ async function fetchOpenAiCompatJson(
 
   const data = await response.json();
   return data?.choices?.[0]?.message?.content || '[]';
+}
+
+async function fetchGeminiModels(apiKey: string): Promise<ProviderModel[]> {
+  const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models', {
+    headers: {'x-goog-api-key': apiKey},
+  });
+
+  if (!response.ok) {
+    throw new Error(await parseErrorMessage(response, 'Gemini model list request failed.'));
+  }
+
+  const data = await response.json();
+  return (data?.models || [])
+    .filter((model: any) => model?.supportedGenerationMethods?.includes('generateContent'))
+    .map((model: any) => {
+      const id = String(model.name || '').replace(/^models\//, '');
+      return {
+        id,
+        label: model.displayName ? `${model.displayName} (${id})` : id,
+      };
+    })
+    .filter((model: ProviderModel) => model.id);
+}
+
+async function fetchOpenAiCompatModels(apiKey: string, baseUrl: string): Promise<ProviderModel[]> {
+  const response = await fetch(`${baseUrl}/models`, {
+    headers: {Authorization: `Bearer ${apiKey}`},
+  });
+
+  if (!response.ok) {
+    throw new Error(await parseErrorMessage(response, 'Model list request failed.'));
+  }
+
+  const data = await response.json();
+  const rawModels = Array.isArray(data?.data) ? data.data : [];
+
+  return rawModels
+    .map((model: any) => {
+      const id = typeof model === 'string' ? model : model?.id;
+      return id ? {id: String(id), label: String(id)} : null;
+    })
+    .filter(Boolean)
+    .sort((a: ProviderModel, b: ProviderModel) => a.id.localeCompare(b.id)) as ProviderModel[];
+}
+
+export async function listProviderModels(config: DirectApiConfig): Promise<ProviderModel[]> {
+  const provider = requireProvider(config.provider);
+
+  if (provider === 'gemini') {
+    return fetchGeminiModels(config.apiKey);
+  }
+
+  return fetchOpenAiCompatModels(config.apiKey, getOpenAiCompatBaseUrl(provider, config));
 }
 
 async function requestTextJson(config: DirectApiConfig, systemPrompt: string, userText: string): Promise<string> {

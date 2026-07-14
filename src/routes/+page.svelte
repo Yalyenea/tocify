@@ -22,7 +22,7 @@
   import {renderQueue} from '../lib/pdf/render-queue';
   import {setOutline} from '../lib/pdf/outliner';
   import {debounce} from '$lib';
-  import {buildTree, convertPdfJsOutlineToTocItems, setNestedValue, findActiveTocPath, cleanTocItems} from '$lib/utils';
+  import {buildTree, convertPdfJsOutlineToTocItems, setNestedValue, findActiveTocPath, cleanTocItems, isLegacyBrowser} from '$lib/utils';
   import {generateToc, ERROR_NEEDS_API_KEY} from '$lib/toc-service';
   import {applyCustomPrefix} from '$lib/utils/prefix';
   import {setPageLabels} from '$lib/pdf/page-labels';
@@ -45,6 +45,10 @@
 
   let pdfjs: typeof PdfjsLibTypes | null = null;
   let PdfLib: typeof import('pdf-lib') | null = null;
+
+  const configurePdfWorker = (pdfjsModule: typeof PdfjsLibTypes) => {
+    pdfjsModule.GlobalWorkerOptions.workerSrc = isLegacyBrowser() ? '/pdf.worker.legacy.min.mjs' : '/pdf.worker.min.mjs';
+  };
 
   let isDragging = false;
   let isFileLoading = false;
@@ -393,9 +397,13 @@
   });
 
   const loadPdfLibraries = async () => {
-    if (pdfjs && PdfLib) return;
+    if (pdfjs && PdfLib) {
+      configurePdfWorker(pdfjs);
+      return;
+    }
     try {
       const [pdfjsModule, PdfLibModule] = await Promise.all([import('pdfjs-dist'), import('pdf-lib')]);
+      configurePdfWorker(pdfjsModule);
       pdfjs = pdfjsModule;
       PdfLib = PdfLibModule;
     } catch (error: any) {

@@ -2,6 +2,7 @@ import { env } from '$env/dynamic/private';
 
 import {
   generateBoard,
+  listProviderModels,
   normalizeProvider,
   processToc,
   type GraphNodeInput,
@@ -162,6 +163,34 @@ export async function generateBoardOnServer({
     apiKey: resolvedApiKey,
     baseUrl: baseUrl || env.CUSTOM_BASE_URL,
     textModel: resolveTextModel(resolvedProvider, textModel, doubaoEndpointIdText),
+    customProviderName: customProviderName || env.CUSTOM_PROVIDER_NAME,
+  });
+}
+
+export async function listProviderModelsOnServer({
+  request,
+  apiKey,
+  provider,
+  baseUrl,
+  customProviderName,
+}: {
+  request: Request;
+  apiKey?: string;
+  provider?: string;
+  baseUrl?: string;
+  customProviderName?: string;
+}) {
+  const resolvedProvider = determineProvider(request, provider);
+  const resolvedApiKey = resolveApiKey(resolvedProvider, apiKey);
+
+  if (!resolvedApiKey) {
+    throw new Error(`[${providerLabel(resolvedProvider)}] API Key is missing.`);
+  }
+
+  return listProviderModels({
+    provider: resolvedProvider,
+    apiKey: resolvedApiKey,
+    baseUrl: baseUrl || env.CUSTOM_BASE_URL,
     customProviderName: customProviderName || env.CUSTOM_PROVIDER_NAME,
   });
 }

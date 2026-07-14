@@ -12,3 +12,5 @@
 - Fixed direct replacement by requesting source-file write permission before PDF generation consumes browser user activation.
 - Added configurable text and vision models for AI providers, plus custom OpenAI-compatible provider settings.
 - Cleared production build warnings from Svelte accessibility checks, pdf.js SSR imports, Upstash initialization, Browserslist data, and unused imports.
+- Added provider model-list fetching so API settings can populate text and vision model choices from Gemini or OpenAI-compatible `/models` endpoints.
+- Fixed browser PDF loading by configuring the pdf.js worker source before calling `getDocument`.

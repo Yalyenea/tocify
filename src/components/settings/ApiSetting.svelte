@@ -1,8 +1,10 @@
 <script lang="ts">
   import {createEventDispatcher, onMount} from 'svelte';
+  import {get} from 'svelte/store';
   import {slide} from 'svelte/transition';
   import {t} from 'svelte-i18n';
-  import {Bot, ExternalLink, Eye, EyeOff, KeyRound, Link, ScanText, Sparkles} from 'lucide-svelte';
+  import {Bot, ExternalLink, Eye, EyeOff, KeyRound, Link, Loader2, RefreshCw, ScanText, Sparkles} from 'lucide-svelte';
+  import {listProviderModelsDirect, type ProviderModel} from '$lib/llm/client';
 
   export let isExpanded = false;
 
@@ -19,6 +21,9 @@
 
   let isSaved = false;
   let showApiKey = false;
+  let isLoadingModels = false;
+  let modelListError = '';
+  let modelOptions: ProviderModel[] = [];
   const providerLinks = {
     gemini: {
       label: 'Gemini',
@@ -104,6 +109,8 @@
       visionModel: defaults?.visionModel || '',
       customProviderName: defaults?.customProviderName || '',
     };
+    modelOptions = [];
+    modelListError = '';
     isSaved = false;
   }
 
@@ -133,6 +140,55 @@
     setTimeout(() => {
       isExpanded = false;
     }, 400);
+  }
+
+  async function loadModels() {
+    if (!config.provider) return;
+
+    const translate = get(t);
+    if (config.provider === 'custom' && !config.baseUrl.trim()) {
+      modelListError = translate('settings.model_base_url_required');
+      return;
+    }
+
+    isLoadingModels = true;
+    modelListError = '';
+
+    try {
+      const requestConfig = {
+        apiKey: config.apiKey,
+        provider: config.provider,
+        baseUrl: config.baseUrl,
+        customProviderName: config.customProviderName,
+      };
+
+      const models = config.apiKey
+        ? await listProviderModelsDirect(requestConfig)
+        : await (async () => {
+          const response = await fetch('/api/models', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(requestConfig),
+          });
+          const data = await response.json().catch(() => ({}));
+
+          if (!response.ok) {
+            throw new Error(data.error || translate('settings.model_fetch_failed'));
+          }
+
+          return data.models || [];
+        })();
+
+      modelOptions = models;
+      if (modelOptions.length === 0) {
+        modelListError = translate('settings.no_models_found');
+      }
+    } catch (error: any) {
+      modelOptions = [];
+      modelListError = error?.message || translate('settings.model_fetch_failed');
+    } finally {
+      isLoadingModels = false;
+    }
   }
 </script>
 
@@ -201,6 +257,23 @@
                 <ExternalLink size={12} strokeWidth={2.5} />
               </a>
             {/each}
+
+            {#if config.provider}
+              <button
+                type="button"
+                class="shrink-0 inline-flex items-center gap-1 text-xs font-bold text-gray-700 hover:text-black disabled:opacity-50"
+                disabled={isLoadingModels}
+                on:click={loadModels}
+              >
+                {#if isLoadingModels}
+                  <Loader2 size={12} class="animate-spin" strokeWidth={2.5} />
+                  <span>{$t('settings.fetching_models')}</span>
+                {:else}
+                  <RefreshCw size={12} strokeWidth={2.5} />
+                  <span>{$t('settings.fetch_models')}</span>
+                {/if}
+              </button>
+            {/if}
           </div>
         </div>
 
@@ -259,6 +332,7 @@
               <input
                 id="text_model"
                 type="text"
+                list="provider-model-options"
                 class="w-full outline-none text-sm placeholder-gray-400"
                 placeholder={config.provider === 'doubao' ? 'ep-...' : 'model name'}
                 bind:value={config.textModel}
@@ -277,6 +351,7 @@
               <input
                 id="vision_model"
                 type="text"
+                list="provider-model-options"
                 class="w-full outline-none text-sm placeholder-gray-400"
                 placeholder={config.provider === 'doubao' ? 'ep-...' : 'model name'}
                 bind:value={config.visionModel}
@@ -284,6 +359,19 @@
               />
             </div>
           </div>
+
+          {#if modelOptions.length > 0}
+            <datalist id="provider-model-options">
+              {#each modelOptions as model (model.id)}
+                <option value={model.id}>{model.label}</option>
+              {/each}
+            </datalist>
+            <p class="text-[11px] text-gray-500">
+              {$t('settings.models_loaded', {values: {count: modelOptions.length}})}
+            </p>
+          {:else if modelListError}
+            <p class="text-[11px] text-red-600">{modelListError}</p>
+          {/if}
 
           <div class="border-black border-2 rounded-md p-2 w-full">
             <label

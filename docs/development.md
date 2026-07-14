@@ -45,6 +45,8 @@ just preview
 
 用户在界面中填入 API Key 时，目录解析会直接从浏览器请求对应模型，不依赖服务端 key。自定义 provider 需要兼容 OpenAI `/chat/completions` 请求格式。
 
+模型列表获取同样优先走用户 Key 的浏览器直连；未填写用户 Key 时走 `/api/models` 并使用服务端环境变量。自定义 provider 的模型列表需要兼容 OpenAI `/models` 请求格式。
+
 ## 开发约定
 
 - 用 `just` 作为命令入口。

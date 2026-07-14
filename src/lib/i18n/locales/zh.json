@@ -34,7 +34,13 @@
     "start_page": "起始页",
     "start_at": "起始编号",
     "add_segment": "添加分段",
-    "remove": "移除"
+    "remove": "移除",
+    "fetch_models": "获取模型",
+    "fetching_models": "获取中",
+    "model_fetch_failed": "获取模型列表失败",
+    "model_base_url_required": "请先填写自定义 Provider 的 Base URL",
+    "no_models_found": "未返回可用模型",
+    "models_loaded": "已获取 {count} 个模型，可在模型输入框中选择"
   },
   "msg": {
     "pdf_loaded": "PDF 已加载，长按并拖动以选择目录页面",

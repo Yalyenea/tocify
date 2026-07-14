@@ -40,6 +40,7 @@ Tocify 是 SvelteKit 单页工具，主流程集中在 `src/routes/+page.svelte`
 - Gemini 走 Google `generateContent`；Qwen、Doubao、Zhipu 和自定义 provider 走 OpenAI-compatible `/chat/completions`。
 - API 设置支持分别配置文本模型和视觉模型。文本模型用于 AI Format 和知识图谱；视觉模型用于 PDF 目录页识别。
 - 自定义 provider 需要提供 Base URL、API Key、文本模型和视觉模型。
+- API 设置可以拉取 provider 模型列表：Gemini 使用原生 `GET /v1beta/models`，OpenAI-compatible provider 使用 `GET <baseUrl>/models`，返回后供文本模型和视觉模型输入框选择。
 
 ## 文件保存
 
