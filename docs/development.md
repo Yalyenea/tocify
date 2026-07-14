@@ -26,6 +26,14 @@ just build
 just preview
 ```
 
+Vercel 使用 `@sveltejs/adapter-vercel`，部署前运行：
+
+```sh
+just build
+```
+
+部署配置见[Vercel 部署说明](deployment.md)。
+
 ## 环境变量
 
 复制 `.env.example` 为 `.env`，按需填写：

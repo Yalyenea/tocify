@@ -14,3 +14,4 @@
 - Cleared production build warnings from Svelte accessibility checks, pdf.js SSR imports, Upstash initialization, Browserslist data, and unused imports.
 - Added provider model-list fetching so API settings can populate text and vision model choices from Gemini or OpenAI-compatible `/models` endpoints.
 - Fixed browser PDF loading by configuring the pdf.js worker source before calling `getDocument`.
+- Kept the production adapter on Vercel and documented the Vercel deployment configuration.

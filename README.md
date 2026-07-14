@@ -22,6 +22,7 @@ just preview
 ## 文档
 
 - [开发说明](docs/development.md)
+- [Vercel 部署](docs/deployment.md)
 - [架构说明](docs/architecture.md)
 - [验证与测试](docs/testing.md)
 - [变更记录](CHANGELOG.md)
