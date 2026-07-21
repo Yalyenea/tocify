@@ -1,11 +1,9 @@
 import { env } from '$env/dynamic/private';
 
 import {
-  generateBoard,
   listProviderModels,
   normalizeProvider,
   processToc,
-  type GraphNodeInput,
   type Provider,
 } from '$lib/llm/core';
 
@@ -128,41 +126,6 @@ export async function processTocOnServer({
     text,
     textModel: resolveTextModel(resolvedProvider, textModel, doubaoEndpointIdText),
     visionModel: resolveVisionModel(resolvedProvider, visionModel, doubaoEndpointIdVision),
-    customProviderName: customProviderName || env.CUSTOM_PROVIDER_NAME,
-  });
-}
-
-export async function generateBoardOnServer({
-  request,
-  tocItems,
-  apiKey,
-  provider,
-  baseUrl,
-  textModel,
-  customProviderName,
-  doubaoEndpointIdText,
-}: {
-  request: Request;
-  tocItems: GraphNodeInput[];
-  apiKey?: string;
-  provider?: string;
-  baseUrl?: string;
-  textModel?: string;
-  customProviderName?: string;
-  doubaoEndpointIdText?: string;
-}) {
-  const resolvedProvider = determineProvider(request, provider);
-  const resolvedApiKey = resolveApiKey(resolvedProvider, apiKey);
-
-  if (!resolvedApiKey) {
-    throw new Error(`[${ providerLabel(resolvedProvider) }] API Key is missing.`);
-  }
-
-  return generateBoard(tocItems, {
-    provider: resolvedProvider,
-    apiKey: resolvedApiKey,
-    baseUrl: baseUrl || env.CUSTOM_BASE_URL,
-    textModel: resolveTextModel(resolvedProvider, textModel, doubaoEndpointIdText),
     customProviderName: customProviderName || env.CUSTOM_PROVIDER_NAME,
   });
 }

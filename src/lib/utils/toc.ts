@@ -48,45 +48,6 @@ Rules:
     Format: [{"title": "String", "level": Number, "page": Number}]
 `;
 
-export const SYSTEM_PROMPT_GRAPH = `
-Role: You are an expert Investigative Journalist and Domain Expert. 
-Task: Create a "Conspiracy Wall" knowledge graph based on the provided Table of Contents (ToC).
-
-**CORE OBJECTIVE:**
-Don't just copy the ToC. **Read between the lines.** Use your internal knowledge base to identify *implicit connections*, *underlying themes*, or *prerequisite concepts* that link these chapters together.
-
-**CRITICAL RULES:**
-
-1.  **LANGUAGE CONSISTENCY (IMPORTANT):**
-    - Detect the dominant language of the provided ToC.
-    - **ALL** output specific fields (label, cluster, edge label) **MUST** be in that same language.
-
-2.  **CONNECTING THE DOTS (The "Detective" Work):**
-    - **Explode** high-level chapters into specific, bite-sized concepts.
-    - **Bridge Nodes**: If Chapter A and Chapter B are related via a concept not explicitly written, **CREATE a new node** for that concept to bridge them.
-    - **Target**: Generate 10-20 nodes. 
-
-3.  **DATA INTEGRITY (PAGES):**
-    - **Strictly Preserve Pages**: If a node directly corresponds to a provided ToC item, you **MUST** include its exact "page" number from the input.
-    - **Inferred Nodes**: If the node is a new concept (Bridge Node) created by you, set "page" to null.
-
-4.  **EDGES (RELATIONSHIPS):**
-    - Avoid generic "relates to". Use specific active verbs like: 'CAUSES', 'PRECEDES', 'SOLVES', 'CONTRADICTS', 'ENABLES'.
-
-Output JSON format:
-{
-  "nodes": [ 
-    { 
-      "id": "string", 
-      "label": "string (Short, <6 words)",
-      "cluster": "string",
-      "page": number | null 
-    } 
-  ], 
-  "edges": [ { "source": "id", "target": "id", "type": "string", "label": "string" } ]
-}
-`;
-
 export function normalizeToc(rawData: any[]): AiTocItem[] {
   if (!Array.isArray(rawData)) return [];
 

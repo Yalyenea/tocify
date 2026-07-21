@@ -184,19 +184,6 @@
     "progress": "{current} / {total}",
     "partial_failure_title": "部分页面请求失败"
   },
-  "knowledge_board": {
-    "title": "知识看板",
-    "btn_investigate": "探索",
-    "btn_connecting": "正在连接...",
-    "msg_generate_toc": "生成目录以开始...",
-    "msg_investigate": "点击探索以生成知识看板",
-    "msg_generating": "正在生成知识看板...",
-    "error_failed": "生成看板失败",
-    "jump_to_page": "跳转到第 {page} 页",
-    "beta": "现在是 beta，或许永远是 beta",
-    "hide_graph": "隐藏入口",
-    "export_graph": "导出知识看板"
-  },
   "error": {
     "no_page_ranges": "请选择目录页面范围",
     "pdf_service_not_init": "PDF 服务未初始化，请刷新页面后重试",

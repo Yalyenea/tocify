@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased - 2026-07-21
+
+- Removed the knowledge board feature (UI drawer, generate-board API, graph layout utils, and roughjs dependency).
+
 ## Unreleased - 2026-05-19
 
 - Removed upstream marketing, SEO, analytics, site-verification, demo, and sponsor material from the fork.

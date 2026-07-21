@@ -184,19 +184,6 @@
     "progress": "{current} / {total}",
     "partial_failure_title": "Some page ranges failed"
   },
-  "knowledge_board": {
-    "title": "KNOWLEDGE BOARD",
-    "btn_investigate": "Investigate",
-    "btn_connecting": "Connecting...",
-    "msg_generate_toc": "Generate ToC to start...",
-    "msg_investigate": "Investigate to generate the knowledge board",
-    "msg_generating": "Generating the knowledge board...",
-    "error_failed": "Failed to generate board",
-    "jump_to_page": "Jump to page {page}",
-    "beta": "It's beta now, maybe beta forever",
-    "hide_graph": "Hide Entry",
-    "export_graph": "Export Knowledge Board"
-  },
   "error": {
     "no_page_ranges": "No page ranges provided.",
     "pdf_service_not_init": "PDF Service not initialized",

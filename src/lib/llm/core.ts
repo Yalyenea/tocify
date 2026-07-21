@@ -1,7 +1,6 @@
 import { jsonrepair } from 'jsonrepair';
 
 import {
-  SYSTEM_PROMPT_GRAPH,
   SYSTEM_PROMPT_TEXT,
   SYSTEM_PROMPT_VISION,
   normalizeToc,
@@ -26,28 +25,6 @@ export interface ProviderModel {
 export interface TocInputConfig extends DirectApiConfig {
   images?: string[];
   text?: string;
-}
-
-export interface GraphNodeInput {
-  id: string | number;
-  title: string;
-  page?: number | null;
-}
-
-export interface GraphResponse {
-  nodes: Array<{
-    id: string;
-    title: string;
-    isInferred: boolean;
-    page: number | null;
-    cluster: string;
-  }>;
-  edges: Array<{
-    source: string;
-    target: string;
-    type: string;
-    label: string;
-  }>;
 }
 
 const OPENAI_COMPAT_BASE_URL: Record<Exclude<Provider, 'gemini' | 'custom'>, string> = {
@@ -433,61 +410,4 @@ export async function processToc(config: TocInputConfig) {
     }
     throw err;
   }
-}
-
-export async function generateBoard(tocItems: GraphNodeInput[], config: DirectApiConfig): Promise<GraphResponse> {
-  const provider = requireProvider(config.provider);
-  const tocText = tocItems
-    .map((item) => `[ID:${ item.id }] ${ item.title } (Page: ${ item.page || 'N/A' })`)
-    .join('\n');
-
-  const jsonText = provider === 'gemini'
-    ? await fetchGeminiJson(
-      config.apiKey,
-      getGeminiTextModel(config),
-      {
-        generationConfig: {
-          responseMimeType: 'application/json',
-        },
-        contents: [{
-          role: 'user',
-          parts: [{ text: `${ SYSTEM_PROMPT_GRAPH }\n\nToC Data:\n${ tocText }` }],
-        }],
-      },
-      `${ providerLabel(provider, config) } request failed.`,
-    )
-    : await fetchOpenAiCompatJson(
-      config.apiKey,
-      getOpenAiCompatBaseUrl(provider, config),
-      {
-        model: getOpenAiCompatTextModel(provider, config),
-        ...(provider !== 'zhipu' && { max_completion_tokens: 4096 }),
-        messages: [
-          { role: 'system', content: SYSTEM_PROMPT_GRAPH },
-          { role: 'user', content: `ToC Data:\n${ tocText }` },
-        ],
-      },
-      `${ providerLabel(provider, config) } request failed.`,
-    );
-
-  const aiData = parseJsonPayload<{
-    nodes?: Array<{ id: string; label?: string; cluster?: string; page?: number | null }>;
-    edges?: Array<{ source: string; target: string; type: string; label: string }>;
-  }>(jsonText, 'object');
-
-  return {
-    nodes: (aiData.nodes || []).map((aiNode) => {
-      const match = tocItems.find((item) => String(item.id) === String(aiNode.id));
-      const page = aiNode.page !== undefined ? aiNode.page : (match?.page ?? null);
-
-      return {
-        id: aiNode.id,
-        title: aiNode.label || String(aiNode.id),
-        isInferred: !page,
-        page,
-        cluster: aiNode.cluster || 'Unclassified',
-      };
-    }),
-    edges: aiData.edges || [],
-  };
 }

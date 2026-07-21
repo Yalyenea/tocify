@@ -14,7 +14,6 @@ Tocify 是 SvelteKit 单页工具，主流程集中在 `src/routes/+page.svelte`
 
 - `src/routes/+page.svelte`: 主应用状态和工作流编排。
 - `src/routes/api/process-toc/+server.ts`: 服务端 ToC 解析接口。
-- `src/routes/api/generate-board/+server.ts`: 服务端知识看板生成接口。
 - `src/lib/llm/core.ts`: provider 统一调用、JSON 提取和 ToC 标准化入口。
 - `src/lib/llm/client.ts`: 浏览器直连 provider，用于用户自带 API Key。
 - `src/lib/llm/server.ts`: 服务端 provider/key 解析。
@@ -36,9 +35,9 @@ Tocify 是 SvelteKit 单页工具，主流程集中在 `src/routes/+page.svelte`
 ## OCR / AI Provider
 
 - 目录页 OCR 实际是视觉 LLM 解析：`PDFService.getPageAsImage()` 将选中 PDF 页渲染为 JPEG data URL，`generateToc()` 再按 8 页一组发送到 LLM。
-- `src/lib/llm/core.ts` 统一处理文本目录解析、图片目录解析和知识图谱生成。
+- `src/lib/llm/core.ts` 统一处理文本目录解析和图片目录解析。
 - Gemini 走 Google `generateContent`；Qwen、Doubao、Zhipu 和自定义 provider 走 OpenAI-compatible `/chat/completions`。
-- API 设置支持分别配置文本模型和视觉模型。文本模型用于 AI Format 和知识图谱；视觉模型用于 PDF 目录页识别。
+- API 设置支持分别配置文本模型和视觉模型。文本模型用于 AI Format；视觉模型用于 PDF 目录页识别。
 - 自定义 provider 需要提供 Base URL、API Key、文本模型和视觉模型。
 - API 设置可以拉取 provider 模型列表：Gemini 使用原生 `GET /v1beta/models`，OpenAI-compatible provider 使用 `GET <baseUrl>/models`，返回后供文本模型和视觉模型输入框选择。
 

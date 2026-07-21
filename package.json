@@ -40,7 +40,6 @@
 		"lucide-svelte": "^0.474.0",
 		"pdf-fontkit": "^1.8.9",
 		"pdf-lib": "^1.17.1",
-		"roughjs": "^4.6.6",
 		"short-unique-id": "^5.2.0",
 		"svelte-dnd-action": "^0.9.68",
 		"svelte-file-dropzone": "^2.0.9",

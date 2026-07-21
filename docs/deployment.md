@@ -41,6 +41,6 @@ just build
 
 - PDF 打开、目录编辑和导出
 - 用户自带 API Key 的直连调用
-- 服务端 API Key 的目录解析和知识看板
+- 服务端 API Key 的目录解析
 - `/api/models` 模型列表获取
 - 未配置或超出 Upstash 限流时的错误提示

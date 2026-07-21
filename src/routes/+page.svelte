@@ -1,7 +1,6 @@
 <script lang="ts">
   import {onMount, onDestroy, tick} from 'svelte';
   import {get} from 'svelte/store';
-  import {fade, fly} from 'svelte/transition';
   import {t, isLoading} from 'svelte-i18n';
   import type * as PdfjsLibTypes from 'pdfjs-dist';
 
@@ -37,9 +36,6 @@
   import SidebarPanel from '../components/panels/SidebarPanel.svelte';
   import PreviewPanel from '../components/panels/PreviewPanel.svelte';
 
-  import TocRelation from '../components/KnowledgeBoard.svelte';
-  import {ChevronRight, ChevronLeft} from 'lucide-svelte';
-
   const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
   const TWO_SECONDS = 2000;
 
@@ -60,9 +56,6 @@
   
   let highlightPageNum = 0;
   let hasShownTocHint = false;
-
-  let showGraphDrawer = false;
-  let isGraphEntranceVisible = true;
 
   let showOffsetModal = false;
   let showHelpModal = false;
@@ -124,16 +117,6 @@
 
   onMount(() => {
     $pdfService = new PDFService();
-
-    const hideUntil = localStorage.getItem('tocify_hide_graph_entrance_until');
-    if (hideUntil) {
-      const expiry = parseInt(hideUntil, 10);
-      if (Date.now() < expiry) {
-        isGraphEntranceVisible = false;
-      } else {
-        localStorage.removeItem('tocify_hide_graph_entrance_until');
-      }
-    }
 
     // Global error handlers
     const handleRejection = (event: PromiseRejectionEvent) => {
@@ -1167,66 +1150,6 @@
     toastProps = {show: true, message: event.detail.message, type: event.detail.type};
   };
 </script>
-
-{#if !showGraphDrawer && tocItems && isGraphEntranceVisible}
-  <button
-    transition:fly={{x: -50, duration: 300}}
-    class="fixed -left-1 p-1 md:p-2 md:left-0 top-[40vh] z-40 bg-white border-2 border-black border-l-0 rounded-r-lg shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-yellow-200 transition-colors flex flex-col items-center gap-2 group"
-    on:click={() => (showGraphDrawer = true)}
-    title="Show Content Graph"
-  >
-    <div class="writing-mode-vertical text-xs font-bold font-mono tracking-widest uppercase rotate-180 select-none">
-      Graph
-    </div>
-    <ChevronRight class="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-  </button>
-{/if}
-
-<div
-  class={`fixed inset-y-0 left-0 z-50 flex transition-transform duration-300 ease-in-out ${showGraphDrawer ? 'translate-x-0' : '-translate-x-full'}`}
->
-  <div class="h-full w-[85vw] md:w-[540px] bg-white shadow-[10px_0_15px_-3px_rgba(0,0,0,0.1)] flex flex-col relative">
-    <button
-      class="p-2 right-0 bottom-[50%] absolute z-50 inline text-gray-400"
-      on:click={() => (showGraphDrawer = false)}
-    >
-      <ChevronLeft class="w-8 h-8 hover:-translate-x-1 transition-transform" />
-    </button>
-
-    <div class="flex-1 overflow-hidden relative w-full h-full bg-slate-50">
-      {#key $curFileFingerprint}
-        <TocRelation
-          items={$tocItems}
-          onJumpToPage={jumpToLogicalPage}
-          title={pdfState.filename ? `${pdfState.filename}`.replace('.pdf', '') : 'No file loaded'}
-          onHide={() => {
-            showGraphDrawer = false;
-            isGraphEntranceVisible = false;
-            const expiry = Date.now() + THIRTY_DAYS;
-            localStorage.setItem('tocify_hide_graph_entrance_until', expiry.toString());
-          }}
-        />
-      {/key}
-    </div>
-  </div>
-
-  {#if showGraphDrawer}
-    <div
-      transition:fade={{duration: 200}}
-      class="flex-1 bg-black/20 backdrop-blur-sm cursor-pointer"
-      role="button"
-      tabindex="0"
-      aria-label="Close knowledge board"
-      on:click={() => (showGraphDrawer = false)}
-      on:keydown={(event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          showGraphDrawer = false;
-        }
-      }}
-    ></div>
-  {/if}
-</div>
 
 {#if toastProps.show}
   <Toast

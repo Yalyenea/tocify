@@ -12,8 +12,6 @@ just build
 当前已知 `just check` 主要失败面：
 
 - `src/lib/index.ts`: `debounce` 缺少显式类型。
-- `src/lib/utils/graph.ts`: 图布局函数缺少节点 / 边类型。
-- `src/components/KnowledgeBoard.svelte`: JS 脚本块缺少 props、DOM 引用和图数据类型。
 - `src/components/settings/ApiSetting.svelte`: provider 字符串索引类型不收敛。
 - 多个 Svelte 组件存在 a11y warning。
 
