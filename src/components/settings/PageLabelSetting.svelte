@@ -69,7 +69,7 @@
       on:click={() => dispatch('jumpToPage', { page: seg.startPage })}
     >
       <div class="flex justify-between items-center mb-1">
-        <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">{$t('label.segment_range_n', {values: {n: i + 1}})}</span>
+        <span class="text-[11px] font-medium uppercase tracking-wide text-slate-400">{$t('label.segment_range_n', {values: {n: i + 1}})}</span>
         <button class="text-gray-400 hover:text-black p-1 hover:bg-gray-100 rounded transition-colors"
           on:click={() => removeSegment(i)}
           title={$t('settings.remove')}
@@ -84,7 +84,7 @@
             id={`page-label-start-${i}`}
             type="number"
             min="1"
-            class="w-full h-8 text-sm border-2 border-gray-300 rounded px-2 focus:outline-none focus:bg-gray-50"
+            class="input h-8"
             value={seg.startPage}
             on:input={(e) =>
               updateSegment(i, { startPage: parseInt((e.target as HTMLInputElement).value, 10) || 1 })}
@@ -95,7 +95,7 @@
           <label for={`page-label-style-${i}`} class="text-xs text-gray-500 block mb-1">{$t('settings.style')}</label>
           <select
             id={`page-label-style-${i}`}
-            class="w-full h-8 text-sm border-2 border-gray-300 rounded px-2 bg-transparent focus:outline-none focus:ring-2 focus:ring-black/20"
+            class="input h-8"
             value={seg.style}
             on:change={(e) =>
               updateSegment(i, { style: (e.target as HTMLSelectElement).value as PageLabelStyle })}
@@ -113,7 +113,7 @@
           <input
             id={`page-label-prefix-${i}`}
             type="text"
-            class="w-full h-8 text-sm border-2 border-gray-300 rounded px-2 focus:outline-none focus:bg-gray-50"
+            class="input h-8"
             placeholder="e.g. A-"
             value={seg.prefix}
             on:input={(e) => updateSegment(i, { prefix: (e.target as HTMLInputElement).value })}
@@ -126,7 +126,7 @@
             id={`page-label-start-at-${i}`}
             type="number"
             min="1"
-            class="w-full h-8 text-sm border-2 border-gray-300 rounded px-2 focus:outline-none focus:bg-gray-50"
+            class="input h-8"
             value={seg.startAt}
             on:input={(e) =>
               updateSegment(i, { startAt: parseInt((e.target as HTMLInputElement).value, 10) || 1 })}
@@ -139,7 +139,7 @@
   {/each}
 
   <button
-    class="w-full h-9 border-2 border-gray-500 rounded-md bg-white hover:bg-gray-50 text-base font-bold leading-none"
+    class="btn-secondary w-full h-9"
     on:click={addSegment}
     title={$t('settings.add_segment')}
     aria-label={$t('settings.add_segment')}

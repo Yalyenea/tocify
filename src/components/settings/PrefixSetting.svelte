@@ -57,7 +57,7 @@
         on:change={handleChange}
       />
       <div
-        class="w-11 h-6 bg-gray-200 peer-focus:outline-none border-2 border-black rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-black after:border-2 after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-gray-800"
+        class="toggle-track relative"
       ></div>
     </label>
   </div>
@@ -69,10 +69,10 @@
     >
       {#each settings.configs as config, i}
         <div
-          class="border-2 border-black rounded-md bg-white overflow-hidden transition-all duration-200 shadow-[2px_2px_0px_rgba(0,0,0,0.1)]"
+          class="overflow-hidden rounded-md bg-slate-50 transition-all duration-200"
         >
           <button
-            class="w-full flex justify-between items-center px-3 py-2 border-b-2 border-transparent hover:bg-gray-50 transition-colors text-left"
+            class="flex w-full items-center justify-between border-b border-transparent px-3 py-2 text-left transition-colors hover:bg-slate-50"
             class:border-gray-100={expandedStates[i]}
             on:click={() => toggleExpand(i)}
           >
@@ -93,13 +93,13 @@
                 <path d="m6 9 6 6 6-6" />
               </svg>
 
-              <span class="font-bold text-sm select-none">
+              <span class="select-none text-sm font-medium text-slate-700">
                 {i === 0 ? $t('settings.first_level') : $t('settings.other_levels')}
               </span>
             </div>
 
             <div
-              class="text-xs font-mono bg-yellow-300 text-black px-2 py-0.5 rounded border border-yellow-200 truncate max-w-[150px] sm:max-w-[240px]"
+              class="max-w-[150px] truncate rounded bg-amber-50 px-2 py-0.5 text-xs text-amber-900 sm:max-w-[240px]"
               title={$t('settings.preview')}
             >
               {getPreview(config, i)} Title
@@ -117,7 +117,7 @@
                     <label for={`prefix-style-${i}`} class="text-sm text-gray-500 mb-1 block">{$t('settings.style')}</label>
                     <select
                       id={`prefix-style-${i}`}
-                      class="w-full h-8 text-xs border-2 border-gray-300 rounded px-2 bg-transparent focus:outline-none focus:ring-2 focus:ring-black/20"
+                      class="input h-8 text-xs"
                       bind:value={config.style}
                       on:change={handleChange}
                     >
@@ -148,7 +148,7 @@
                         <input
                           id={`prefix-separator-${i}`}
                           type="text"
-                          class="w-full h-8 text-xs border-2 border-gray-300 rounded text-center focus:outline-none focus:bg-gray-50"
+                          class="input h-8 text-center text-xs"
                           bind:value={config.separator}
                           on:input={handleChange}
                         />
@@ -163,7 +163,7 @@
                     <input
                       id={`prefix-prefix-${i}`}
                       type="text"
-                      class="w-full h-8 text-xs border-2 border-gray-300 rounded px-2 focus:outline-none focus:bg-gray-50"
+                      class="input h-8 text-xs"
                       placeholder="e.g. Chapter"
                       bind:value={config.prefix}
                       on:input={handleChange}
@@ -177,7 +177,7 @@
                     <input
                       id={`prefix-suffix-${i}`}
                       type="text"
-                      class="w-full h-8 text-xs border-2 border-gray-300 rounded px-2 focus:outline-none focus:bg-gray-50"
+                      class="input h-8 text-xs"
                       placeholder="e.g. ."
                       bind:value={config.suffix}
                       on:input={handleChange}

@@ -6,19 +6,25 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans:
-            [
-              'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas',
-              '"Liberation Mono"', '"Courier New"',
-
-              '"Microsoft YaHei"', '"PingFang SC"', '"Hiragino Sans GB"',
-              '"Heiti SC"', '"WenQuanYi Micro Hei"',
-
-              'sans-serif'
-            ],
+        sans: [
+          'Inter',
+          'ui-sans-serif',
+          'system-ui',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          '"Segoe UI"',
+          'Roboto',
+          '"Helvetica Neue"',
+          'Arial',
+          '"Noto Sans"',
+          '"PingFang SC"',
+          '"Hiragino Sans GB"',
+          '"Microsoft YaHei"',
+          'sans-serif',
+        ],
       },
-    }
+    },
   },
 
-  plugins: [typography]
+  plugins: [typography],
 } satisfies Config;

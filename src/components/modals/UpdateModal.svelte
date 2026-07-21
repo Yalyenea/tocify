@@ -24,10 +24,6 @@
 
       errorMessage = `Error: ${e.message || JSON.stringify(e)}`;
       isUpdating = false;
-
-      // console.error('Update failed:', e);
-      // errorMessage = e.message || 'Download failed. Please check your network connection.';
-      // isUpdating = false;
     }
   };
 
@@ -40,71 +36,68 @@
 
 {#if showUpdateModal && updateData}
   <div
-    class="fixed inset-0 bg-gray-400/90 flex items-center justify-center z-[60] p-4"
+    class="modal-backdrop z-[60]"
     transition:fade={{duration: 150}}
     on:click|self={handleClose}
   >
     <div
-      class="bg-white rounded-lg p-0 max-w-lg w-full max-h-[85vh] flex flex-col border-4 border-black shadow-[12px_12px_0px_rgba(0,0,0,1)] relative overflow-hidden"
-      transition:fly={{y: 20, duration: 200}}
+      class="modal-panel relative flex max-h-[85vh] max-w-lg flex-col overflow-hidden p-0"
+      transition:fly={{y: 12, duration: 180}}
       on:click|stopPropagation
     >
-      <div class="bg-yellow-300 border-b-4 border-black p-5 flex justify-between items-center">
+      <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
         <div class="flex items-center gap-3">
-          <div class="bg-white p-2 border-2 border-black rounded shadow-[2px_2px_0px_rgba(0,0,0,1)]">
-            <Sparkles
-              size={24}
-              class="text-black"
-            />
+          <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+            <Sparkles size={18} />
           </div>
           <div>
-            <h2 class="text-2xl font-black italic tracking-tighter">NEW VERSION</h2>
-            <p class="text-xs font-bold ">v{updateData.version} is available!</p>
+            <h2 class="text-base font-semibold text-slate-900">New Version</h2>
+            <p class="text-xs text-slate-500">v{updateData.version} is available</p>
           </div>
         </div>
 
         {#if !isUpdating}
           <button
             on:click={handleClose}
-            class="p-2 rounded-lg border-2 border-transparent hover:bg-black hover:text-white transition-colors"
+            class="btn-icon"
           >
-            <X size={24} />
+            <X size={18} />
           </button>
         {/if}
       </div>
 
-      <div class="p-6 overflow-y-auto custom-scrollbar flex-1">
+      <div class="flex-1 overflow-y-auto p-5">
         {#if errorMessage}
           <div
-            class="mb-4 bg-red-100 border-2 border-red-600 text-red-700 p-3 rounded flex items-start gap-3"
+            class="error-banner mb-4 flex items-start gap-2.5"
             transition:fade
           >
             <AlertTriangle
-              class="shrink-0 mt-0.5"
-              size={20}
+              class="mt-0.5 shrink-0"
+              size={16}
             />
-            <div class="text-sm font-bold">
-              <p>Update Failed:</p>
+            <div class="text-sm">
+              <p class="font-medium">Update Failed</p>
               <p class="font-normal">{errorMessage}</p>
             </div>
           </div>
         {/if}
 
-        <div class="prose prose-sm max-w-none">
-          <p class="font-bold text-lg mb-2">✨ What's New:</p>
+        <div class="prose prose-sm max-w-none prose-slate">
+          <p class="mb-2 text-sm font-medium text-slate-800">What's New</p>
           <div
-            class="bg-gray-50 border-2 border-black rounded p-4  text-sm whitespace-pre-wrap leading-relaxed"
+            class="rounded-md bg-slate-50 p-3.5 text-sm leading-relaxed whitespace-pre-wrap text-slate-700"
           >
             {updateData.body || 'Bug fixes and performance improvements.'}
           </div>
         </div>
       </div>
 
-      <div class="p-6 pt-0 mt-auto grid grid-cols-2 gap-4">
+      <div class="mt-auto grid grid-cols-2 gap-2.5 border-t border-slate-100 p-5">
         <button
           on:click={handleClose}
           disabled={isUpdating}
-          class="px-4 py-3 font-bold border-2 border-black rounded bg-white text-black hover:bg-gray-100 transition-all active:translate-x-[2px] active:translate-y-[2px] shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_rgba(0,0,0,1)] active:shadow-none disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-[2px_2px_0px_rgba(0,0,0,1)] disabled:translate-x-0 disabled:translate-y-0"
+          class="btn-secondary"
         >
           Later
         </button>
@@ -112,19 +105,16 @@
         <button
           on:click={handleUpdateClick}
           disabled={isUpdating}
-          class="flex items-center justify-center gap-2 px-4 py-3 font-bold border-2 border-black rounded bg-green-400 text-black transition-all active:translate-x-[2px] active:translate-y-[2px] shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:bg-green-300 active:shadow-none disabled:bg-green-200 disabled:cursor-not-allowed disabled:shadow-[2px_2px_0px_rgba(0,0,0,1)] disabled:translate-x-0 disabled:translate-y-0"
+          class="btn-success"
         >
           {#if isUpdating}
             <Loader2
-              size={20}
+              size={16}
               class="animate-spin"
             />
             <span>Installing...</span>
           {:else}
-            <Download
-              size={20}
-              strokeWidth={3}
-            />
+            <Download size={16} />
             <span>Update Now</span>
           {/if}
         </button>

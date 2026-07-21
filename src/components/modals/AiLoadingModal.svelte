@@ -9,14 +9,12 @@
 
 {#if isAiLoading}
   <div
-    class="fixed inset-0 flex flex-col items-center justify-center z-50 bg-yellow-400"
-    transition:fade={{duration: 200}}
+    class="modal-backdrop"
+    transition:fade={{duration: 180}}
   >
-    <div
-      class="bg-white p-8 sm:p-12 border-4 border-black rounded-lg shadow-[8px_8px_0px_rgba(0,0,0,1)] flex flex-col items-center gap-6 w-11/12 max-w-md"
-    >
-      <div class="text-xl text-center font-bold text-black">
-        <span>
+    <div class="modal-panel flex max-w-sm flex-col items-center gap-5 p-8">
+      <div class="text-center text-sm leading-6 text-slate-700">
+        <p class="font-medium text-slate-900">
           {$t('loading.extracting_pages', {
             values: {
               ranges: tocRanges
@@ -24,21 +22,19 @@
                 .join(', '),
             }
           })}
-        </span>
-        <br />
-        <br />
-        <span>{$t('loading.take_minutes')}</span>
+        </p>
+        <p class="mt-2 text-slate-500">{$t('loading.take_minutes')}</p>
       </div>
-      <div class="animate-spin rounded-full h-12 w-12 border-4 border-black border-t-transparent"></div>
+      <div class="spinner h-9 w-9"></div>
 
       {#if aiProgress && aiProgress.total > 1}
-        <div class="flex flex-col items-center gap-1 w-full">
-          <div class="text-sm font-mono font-bold text-gray-700">
+        <div class="flex w-full flex-col items-center gap-1.5">
+          <div class="text-xs font-medium text-slate-500">
             {$t('loading.progress', { values: { current: aiProgress.current, total: aiProgress.total } })}
           </div>
-          <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden border border-gray-300">
+          <div class="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
             <div
-              class="h-full bg-black rounded-full transition-all duration-300"
+              class="h-full rounded-full bg-blue-600 transition-all duration-300"
               style="width: {Math.round((aiProgress.current / aiProgress.total) * 100)}%"
             ></div>
           </div>

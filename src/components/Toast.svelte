@@ -18,37 +18,39 @@
     return () => clearTimeout(timeout);
   });
 
+  const styles = {
+    success: 'border-emerald-200 bg-emerald-50 text-emerald-800',
+    error: 'border-red-200 bg-red-50 text-red-800',
+    info: 'border-blue-200 bg-blue-50 text-blue-800',
+  };
 </script>
 
 <div
-  class="fixed md:top-5 md:right-5 text-black right-1/2 w-[90vw] md:w-fit max-w-[90vw] transform translate-x-1/2 md:-translate-x-0 p-2 md:p-4 rounded-lg shadow-[2px_2px_0px_rgba(0,0,0,1)] flex items-center z-[999] border-2 border-black"
-  class:bg-lime-400={type === 'success'}
-  class:bg-red-500={type === 'error'}
-  class:bg-yellow-400={type === 'info'}
-  transition:fly={{ y: -50, x: 0, duration: 300, opacity: 0.5 }}>
+  class="fixed right-1/2 top-4 z-[999] flex w-[90vw] max-w-[90vw] translate-x-1/2 items-center rounded-lg border px-3 py-2.5 shadow-sm md:right-5 md:top-5 md:w-fit md:translate-x-0 {styles[type]}"
+  transition:fly={{ y: -24, x: 0, duration: 220, opacity: 0.5 }}>
   {#if type === 'success'}
     <CheckCircle
-      size={20}
-      class="mr-3 flex-shrink-0"
+      size={18}
+      class="mr-2.5 flex-shrink-0"
     />
   {:else if type === 'error'}
     <AlertTriangle
-      size={20}
-      class="mr-3 flex-shrink-0"
+      size={18}
+      class="mr-2.5 flex-shrink-0"
     />
   {:else}
     <InfoIcon
-      size={20}
-      class="mr-3 flex-shrink-0"
+      size={18}
+      class="mr-2.5 flex-shrink-0"
     />
   {/if}
 
-  <span class="font-semibold pr-8">{message}</span>
+  <span class="pr-7 text-sm font-medium">{message}</span>
 
   <button
     on:click={() => dispatch('close')}
-    class="absolute right-2 p-1 rounded-full text-black hover:bg-black hover:text-white transition-colors"
+    class="absolute right-1.5 rounded-md p-1 opacity-60 transition-colors hover:bg-black/5 hover:opacity-100"
   >
-    <X size={20} />
+    <X size={16} />
   </button>
 </div>

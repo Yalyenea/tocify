@@ -741,7 +741,7 @@
       placeholder={$t('toc.outline_placeholder')}
       bind:value={text}
       on:input={handleInput}
-      class="w-full h-full border-2 border-black rounded-lg p-2 text-sm myfocus leading-6 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none pr-10"
+      class="input myfocus h-full w-full resize-none p-2.5 pr-10 text-sm leading-6"
     ></textarea>
 
     {#if hasInvalidLines}
@@ -755,17 +755,17 @@
           <button
             on:click={handleAiFormat}
             disabled={isProcessing || !text.trim()}
-            class="flex items-center gap-1.5 bg-gradient-to-br from-blue-300 to-pink-600 text-white px-3 py-1.5 rounded-md shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95"
+            class="btn-primary btn-sm disabled:cursor-not-allowed"
           >
             {#if isProcessing}
               <Loader2
-                size={16}
+                size={14}
                 class="animate-spin"
               />
-              <span class="text-xs font-bold">Processing...</span>
+              <span>Processing...</span>
             {:else}
-              <Sparkles size={16} />
-              <span class="text-xs font-bold">AI Format</span>
+              <Sparkles size={14} />
+              <span>AI Format</span>
             {/if}
           </button>
         </Tooltip>
@@ -803,51 +803,51 @@
 
       {#if selectedCount >= 1}
         <div class="sticky top-12 z-30 mb-3 ml-12 pointer-events-none">
-          <div class="pointer-events-auto flex flex-wrap items-center gap-2 bg-white/35 backdrop-blur-sm border-2 border-black/95 rounded-lg px-3 py-2">
-            <span class="text-xs font-semibold text-gray-700">
+          <div class="pointer-events-auto flex flex-wrap items-center gap-1.5 rounded-md bg-slate-50/95 px-2.5 py-1.5 backdrop-blur-sm">
+            <span class="text-xs font-medium text-slate-600">
               {$t('toc.batch_operations')} {$t('toc.selected_count', {values: {count: selectedCount}})}
             </span>
             <button
               on:click={clearSelection}
-              class="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold border-2 border-transparent rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+              class="btn-ghost btn-sm"
               title={$t('toc.clear_selection')}
             >
-              <X size={14} />
+              <X size={13} />
               {$t('toc.clear_selection')}
             </button>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-1.5">
               <button
                 on:click={() => adjustSelectedLevels(-1)}
                 title={$t('toc.promote_selected_hint')}
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-blue-400 text-black border-2 border-black rounded-lg shadow-[1px_1px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+                class="btn-secondary btn-sm"
               >
-                <ArrowUp size={14} />
+                <ArrowUp size={13} />
                 {$t('toc.promote_selected')}
               </button>
               <button
                 on:click={() => adjustSelectedLevels(1)}
                 title={$t('toc.demote_selected_hint')}
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-lime-400 text-black border-2 border-black rounded-lg shadow-[1px_1px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+                class="btn-secondary btn-sm"
               >
-                <ArrowDown size={14} />
+                <ArrowDown size={13} />
                 {$t('toc.demote_selected')}
               </button>
 
               {#if showBatchOffsetEditor}
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-1.5">
                   <input
                     type="number"
                     bind:value={batchOffsetInput}
                     placeholder={$t('toc.offset_placeholder')}
                     on:keydown={(e) => e.key === 'Enter' && applyBatchOffset()}
-                    class="w-20 border-2 border-black rounded px-2 py-1.5 text-xs myfocus focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    class="input myfocus w-16 py-1 text-xs"
                   />
                   <button
                     on:click={applyBatchOffset}
                     title={$t('toc.apply_offset_hint')}
-                    class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-yellow-400 text-black border-2 border-black rounded-lg shadow-[1px_1px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+                    class="btn-primary btn-sm"
                   >
-                    <Hash size={14} />
+                    <Hash size={13} />
                     {$t('toc.apply_offset')}
                   </button>
                 </div>
@@ -858,9 +858,9 @@
                     batchOffsetInput = '';
                   }}
                   title={$t('toc.offset_selected_hint')}
-                  class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-yellow-400 text-black border-2 border-black rounded-lg shadow-[1px_1px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+                  class="btn-secondary btn-sm"
                 >
-                  <Hash size={14} />
+                  <Hash size={13} />
                   {$t('toc.offset_selected')}
                 </button>
               {/if}
@@ -887,7 +887,7 @@
           items: $tocItems,
           flipDurationMs,
           dragDisabled: $dragDisabled,
-          dropTargetStyle: {outline: '2px dashed #000', borderRadius: '8px'},
+          dropTargetStyle: {outline: '1px dashed #94a3b8', borderRadius: '6px'},
         }}
         on:consider={handleDndConsider}
         on:finalize={handleDndFinalize}
@@ -921,22 +921,22 @@
       </section>
     {/if}
 
-    <div class="flex items-center gap-2 ml-12 mt-3 mb-4">
+    <div class="mb-3 ml-12 mt-2 flex items-center gap-1.5">
       <button
         on:click={addTocItem}
-        class="btn font-bold bg-yellow-400 text-black border-2 border-black rounded-lg px-4 py-2 shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all"
+        class="btn-primary"
       >
         {$t('btn.add_chapter')}
       </button>
       <button
         on:click={() => addMultipleTocItems(5)}
-        class="btn font-bold bg-gray-100 text-black border-2 border-black rounded-lg px-3 py-2 shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-sm"
+        class="btn-secondary btn-sm"
       >
         +5
       </button>
       <button
         on:click={() => addMultipleTocItems(10)}
-        class="btn font-bold bg-gray-100 text-black border-2 border-black rounded-lg px-3 py-2 shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-sm"
+        class="btn-secondary btn-sm"
       >
         +10
       </button>

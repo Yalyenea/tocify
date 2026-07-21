@@ -143,7 +143,7 @@
 
 {#if showChapterExportModal}
   <div
-    class="fixed inset-0 bg-black/40 backdrop-blur-[1px] flex items-center justify-center z-50 p-4"
+    class="modal-backdrop"
     transition:fade={{duration: 150}}
     role="button"
     tabindex="0"
@@ -152,32 +152,32 @@
     on:keydown={closeOnKeydown}
   >
     <div
-      class="bg-white rounded-lg p-5 md:p-6 w-[90%] md:w-[80%] max-w-3xl max-h-[90vh] overflow-y-auto border-2 border-gray-300 "
-      transition:fly={{y: 20, duration: 200}}
+      class="modal-panel w-[92%] max-w-3xl p-4 md:w-[80%] md:p-5"
+      transition:fly={{y: 12, duration: 180}}
       role="dialog"
       aria-modal="true"
       tabindex="-1"
     >
-      <div class="flex justify-between items-start gap-4 mb-4">
+      <div class="mb-4 flex items-start justify-between gap-3">
         <div>
-          <h2 class="text-xl md:text-2xl font-bold">{$t('chapter_export.title')}</h2>
-          <p class="text-sm text-gray-700 mt-1">{$t('chapter_export.description')}</p>
+          <h2 class="text-lg font-semibold text-slate-900 md:text-xl">{$t('chapter_export.title')}</h2>
+          <p class="mt-1 text-sm text-slate-500">{$t('chapter_export.description')}</p>
         </div>
         <button
           on:click={closeModal}
-          class="p-1 rounded-full text-black hover:bg-gray-100 transition-colors"
+          class="btn-icon"
           aria-label={$t('chapter_export.close')}
         >
-          <X size={24} />
+          <X size={18} />
         </button>
       </div>
 
-      <div class="flex flex-col md:flex-row items-start md:justify-between gap-3 mb-5">
-        <div class="flex flex-wrap items-center gap-y-3 gap-x-2">
+      <div class="mb-4 flex flex-col items-start gap-3 md:flex-row md:justify-between">
+        <div class="flex flex-wrap items-center gap-x-1.5 gap-y-2">
           <button
             type="button"
             on:click={expandAll}
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-yellow-300 text-black border-2 border-black rounded-lg shadow-[1px_1px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+            class="btn-secondary btn-sm"
           >
             <ChevronDown size={14} />
             {$t('chapter_export.expand_all')}
@@ -185,14 +185,14 @@
           <button
             type="button"
             on:click={collapseAll}
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-orange-200 text-black border-2 border-black rounded-lg shadow-[1px_1px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+            class="btn-secondary btn-sm"
           >
             <ChevronsDownUp size={14} />
             {$t('chapter_export.collapse_all')}
           </button>
         </div>
 
-        <div class="flex flex-wrap items-center gap-3 rounded-md bg-gray-50 border border-gray-200 px-2 py-2">
+        <div class="flex flex-wrap items-center gap-3 rounded-md bg-slate-50 px-2 py-2">
           <label class="flex items-center gap-2 text-sm font-medium text-black">
             <input
               type="radio"
@@ -277,21 +277,21 @@
           type="text"
           bind:value={searchQuery}
           placeholder={$t('chapter_export.search_placeholder')}
-          class="block w-full pl-10 pr-10 py-2.5 border-2 border-black rounded-lg focus:ring-0 focus:border-blue-500 bg-white text-sm font-medium transition-all"
+          class="input block w-full py-2 pl-10 pr-10 text-sm"
         />
         {#if searchQuery}
           <button
             type="button"
-            class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-black transition-colors"
+            class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-700"
             on:click={() => (searchQuery = '')}
           >
-            <X size={18} />
+            <X size={16} />
           </button>
         {/if}
       </div>
 
-      <div class="border-2 border-black rounded-lg overflow-hidden">
-        <div class="max-h-[45vh] min-h-[200px] overflow-y-auto divide-y divide-black/10 bg-gray-50">
+      <div class="overflow-hidden rounded-md bg-slate-50">
+        <div class="max-h-[45vh] min-h-[200px] divide-y divide-slate-100 overflow-y-auto">
           {#if chapters.length === 0}
             <div class="px-4 py-6 text-sm text-gray-600">
               {$t('chapter_export.empty')}
@@ -351,11 +351,11 @@
         </div>
       </div>
 
-      <div class="flex flex-col sm:flex-row gap-3 justify-end mt-5">
+      <div class="mt-4 flex flex-col justify-end gap-2 sm:flex-row">
         <button
           type="button"
           on:click={() => (showChapterExportModal = false)}
-          class="px-4 py-2 font-semibold bg-white text-black border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          class="btn-secondary"
         >
           {$t('chapter_export.cancel')}
         </button>
@@ -363,9 +363,9 @@
           type="button"
           on:click={() => dispatch('confirm')}
           disabled={selectedCount === 0}
-          class="inline-flex items-center justify-center gap-2 px-4 py-2 font-bold bg-green-500 text-black border-2 border-black rounded-lg shadow-[1px_1px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:bg-gray-300 disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0"
+          class="btn-success"
         >
-          <Download size={16} />
+          <Download size={15} />
           {$t('chapter_export.export')}
         </button>
       </div>

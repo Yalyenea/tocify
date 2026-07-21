@@ -203,11 +203,7 @@
 {#if item}
   <div>
     <div
-      class="flex items-center gap-1 py-1.5 rounded-md group -mr-1 border-2 border-transparent"
-      class:bg-blue-200={isActive}
-      class:font-bold={isActive}
-      class:border-amber-400={isSelected}
-      class:bg-amber-50={isSelected && !isActive}
+      class="group -mr-1 flex items-center gap-1 rounded-md py-1 {isActive || isSelected ? 'bg-blue-50' : ''} {isActive ? 'font-medium' : ''}"
       data-is-dnd-shadow-item-hint={isShadowItem}
       role="button"
       tabindex="0"
@@ -224,7 +220,7 @@
           type="button"
           on:click|stopPropagation={(e) => onSelect(item, e)}
           on:mousedown|preventDefault
-          class="w-3 h-3 rounded-full border-2 flex-shrink-0 transition-all duration-150 {isSelected ? 'bg-amber-400 border-amber-500 scale-100' : 'border-gray-400 scale-90 opacity-0 group-hover:opacity-60 hover:!opacity-100 hover:!scale-100 hover:!border-amber-400'}"
+          class="h-3 w-3 flex-shrink-0 rounded-full border transition-all duration-150 {isSelected ? 'scale-100 border-blue-500 bg-blue-500' : 'scale-90 border-slate-300 opacity-0 group-hover:opacity-60 hover:!scale-100 hover:!border-blue-400 hover:!opacity-100'}"
           title={$t('toc.select_item')}
           aria-label={$t('toc.select_item')}
         ></button>
@@ -260,7 +256,7 @@
         </button>
 
         {#if $tocConfig.prefixSettings.enabled}
-          <span class="text-xs text-gray-600 font-mono select-none pr-1">
+          <span class="select-none pr-1 text-xs text-slate-500">
             {currentNumber}
           </span>
         {/if}
@@ -277,7 +273,7 @@
           on:keydown={handleTitleKeydown}
           on:keypress={(e) => e.key === 'Enter' && (e.target as HTMLElement).blur()}
           placeholder={prefix === '' ? $t('toc.new_chapter_default') : ($t('toc.new_item_default') || 'New Item')}
-          class="toc-item-title border-2 border-black rounded px-2 py-1 text-sm myfocus focus:outline-none focus:ring-2 focus:ring-blue-500 flex-1 min-w-[100px] placeholder:text-gray-400"
+          class="toc-item-title input-compact myfocus min-w-[100px] flex-1"
         />
       </div>
 
@@ -292,7 +288,7 @@
           handleUpdatePage();
         }}
         on:keypress={(e) => e.key === 'Enter' && (e.target as HTMLElement).blur()}
-        class="w-14 border-2 border-black rounded ml-1 pl-1.5 py-1 text-sm myfocus focus:outline-none focus:ring-2 focus:ring-blue-500"
+        class="input-compact myfocus ml-1 w-12 pl-1.5"
       />
 
       <div class="flex">

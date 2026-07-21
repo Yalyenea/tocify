@@ -6,6 +6,7 @@
 
   import '../lib/i18n';
   import {pdfService, tocItems, curFileFingerprint, tocConfig, autoSaveEnabled, type TocConfig} from '../stores';
+  import {apiConfig} from '$lib/api-config';
   import {PDFService, type PDFState, type TocItem} from '$lib/pdf/service';
   import {
     type ExportableChapter,
@@ -105,14 +106,6 @@
   let lastConfigJson = '';
   let chapterExportItems: ExportableChapter[] = [];
 
-  let customApiConfig = {
-    provider: '',
-    apiKey: '',
-    baseUrl: '',
-    textModel: '',
-    visionModel: '',
-    customProviderName: '',
-  };
   let tocEditor: any;
 
   onMount(() => {
@@ -911,12 +904,12 @@
       const res = await generateToc({
         pdfInstance: originalPdfInstance,
         ranges: tocRanges,
-        apiKey: customApiConfig.apiKey,
-        provider: customApiConfig.provider,
-        baseUrl: customApiConfig.baseUrl,
-        textModel: customApiConfig.textModel,
-        visionModel: customApiConfig.visionModel,
-        customProviderName: customApiConfig.customProviderName,
+        apiKey: $apiConfig.apiKey,
+        provider: $apiConfig.provider,
+        baseUrl: $apiConfig.baseUrl,
+        textModel: $apiConfig.textModel,
+        visionModel: $apiConfig.visionModel,
+        customProviderName: $apiConfig.customProviderName,
         onProgress: (current, total) => {
           aiProgress = { current, total };
         },
@@ -1132,10 +1125,6 @@
     }
   };
 
-  function handleApiConfigChange(e: CustomEvent) {
-    customApiConfig = e.detail;
-  }
-
   function handleApiConfigSave() {
     toastProps = {show: true, message: 'API Settings Saved!', type: 'success'};
   }
@@ -1161,15 +1150,37 @@
 {/if}
 
 {#if $isLoading}
-  <div class="fixed inset-0 bg-white flex items-center justify-center z-50">
-    <div class="animate-spin rounded-full h-12 w-12 border-4 border-black border-t-transparent"></div>
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-50">
+    <div class="spinner h-9 w-9"></div>
   </div>
 {:else}
   <h1 class="sr-only">Generate PDF bookmarks / table of contents in browser — AI-powered, private, online and free.</h1>
 
-  <div
-    class="flex flex-col mt-5 lg:flex-row lg:mt-8 p-2 md:p-4 md:pr-3 gap-4 lg:gap-8 mx-auto w-[95%] md:w-[90%] xl:w-[80%] 3xl:w-[75%] max-w-6xl justify-between"
-  >
+  <div class="flex h-dvh min-h-0 w-full flex-col lg:flex-row">
+    <PreviewPanel
+      {isFileLoading}
+      bind:pdfState
+      {originalPdfInstance}
+      {tocPdfInstance}
+      {isPreviewMode}
+      {isPreviewLoading}
+      {tocRanges}
+      {activeRangeIndex}
+      {tocPageCount}
+      {addPhysicalTocPage}
+      {jumpToTocPage}
+      {currentTocPath}
+      {prefetchPageNum}
+      bind:highlightPageNum
+      bind:isDragging
+      on:fileselect={(e) => loadPdfFile(e.detail)}
+      on:viewerMessage={handleViewerMessage}
+      on:updateActiveRange={handleUpdateActiveRange}
+      on:togglePreview={togglePreviewMode}
+      on:export={exportPDF}
+      on:openChapterExport={openChapterExportModal}
+    />
+
     <SidebarPanel
       {pdfState}
       {originalPdfInstance}
@@ -1178,7 +1189,6 @@
       {aiError}
       {showNextStepHint}
       {config}
-      {customApiConfig}
       {tocPageCount}
       {isPreviewMode}
       bind:tocRanges
@@ -1187,7 +1197,6 @@
       bind:isTocConfigExpanded
       on:openhelp={() => (showHelpModal = true)}
       on:closeNextStepHint={handleCloseNextStepHint}
-      on:apiConfigChange={handleApiConfigChange}
       on:apiConfigSave={handleApiConfigSave}
       on:updateField={(e) => updateTocField(e.detail.path, e.detail.value)}
       on:jumpToTocPage={jumpToTocPage}
@@ -1214,30 +1223,6 @@
       on:updateActiveRange={handleUpdateActiveRange}
       on:aiFormatResponse={handleAiFormatResponse}
       bind:tocEditor
-    />
-
-    <PreviewPanel
-      {isFileLoading}
-      bind:pdfState
-      {originalPdfInstance}
-      {tocPdfInstance}
-      {isPreviewMode}
-      {isPreviewLoading}
-      {tocRanges}
-      {activeRangeIndex}
-      {tocPageCount}
-      {addPhysicalTocPage}
-      {jumpToTocPage}
-      {currentTocPath}
-      {prefetchPageNum}
-      bind:highlightPageNum
-      bind:isDragging
-      on:fileselect={(e) => loadPdfFile(e.detail)}
-      on:viewerMessage={handleViewerMessage}
-      on:updateActiveRange={handleUpdateActiveRange}
-      on:togglePreview={togglePreviewMode}
-      on:export={exportPDF}
-      on:openChapterExport={openChapterExportModal}
     />
   </div>
 

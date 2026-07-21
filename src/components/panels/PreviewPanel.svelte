@@ -86,18 +86,16 @@
   }
 </script>
 
-<div class="flex flex-col w-full lg:w-[70%]">
-  <div
-    class="h-fit pb-4 min-h-[85vh] top-5 sticky border-black border-2 rounded-lg bg-white shadow-[2px_2px_0px_rgba(0,0,0,1)]"
-  >
+<div class="relative flex min-h-[50vh] min-w-0 flex-1 flex-col lg:h-full lg:min-h-0">
+  <div class="relative flex min-h-0 flex-1 flex-col">
     {#if isFileLoading}
       <div
-        class="absolute inset-0 bg-white bg-opacity-80 flex items-center justify-center z-50 rounded-lg"
+        class="absolute inset-0 z-50 flex items-center justify-center bg-white/80"
         transition:fade={{duration: 100}}
       >
-        <div class="flex flex-col items-center gap-4">
-          <div class="animate-spin rounded-full h-12 w-12 border-4 border-black border-t-transparent"></div>
-          <span class="text-xl font-bold">{$t('status.loading_rendering')}</span>
+        <div class="flex flex-col items-center gap-3">
+          <div class="spinner h-10 w-10"></div>
+          <span class="text-sm font-medium text-slate-600">{$t('status.loading_rendering')}</span>
         </div>
       </div>
     {:else}
@@ -120,23 +118,25 @@
     {/if}
 
     {#if pdfState.instance}
-      <div class="relative z-10 h-full flex flex-col">
-        <PDFViewer
-          bind:pdfState
-          mode={isPreviewMode ? 'single' : 'grid'}
-          {originalPdfInstance}
-          {tocPdfInstance}
-          {tocPageCount}
-          {tocRanges}
-          {activeRangeIndex}
-          on:updateActiveRange
-          on:fileloaded={forwardFileLoadedEvent}
-          {jumpToTocPage}
-          {addPhysicalTocPage}
-          {currentTocPath}
-          {prefetchPageNum}
-          bind:highlightPageNum
-        />
+      <div class="relative z-10 flex min-h-0 flex-1 flex-col">
+        <div class="min-h-0 flex-1">
+          <PDFViewer
+            bind:pdfState
+            mode={isPreviewMode ? 'single' : 'grid'}
+            {originalPdfInstance}
+            {tocPdfInstance}
+            {tocPageCount}
+            {tocRanges}
+            {activeRangeIndex}
+            on:updateActiveRange
+            on:fileloaded={forwardFileLoadedEvent}
+            {jumpToTocPage}
+            {addPhysicalTocPage}
+            {currentTocPath}
+            {prefetchPageNum}
+            bind:highlightPageNum
+          />
+        </div>
 
         <input
           type="file"

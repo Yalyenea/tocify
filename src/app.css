@@ -2,17 +2,94 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-@font-face {
-  font-family: 'HuiwenMincho';
-  src: url('https://static.aeriszhu.com/huiwen-mincho.ttf') format('truetype');
-  font-display: swap;
-}
-
 @layer base {
   html,
   body {
-    @apply bg-[#f9f8f5] font-sans;
+    @apply h-full bg-white font-sans text-slate-800 antialiased;
     touch-action: manipulation;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium
+      transition-colors disabled:pointer-events-none disabled:opacity-40;
+  }
+
+  .btn-primary {
+    @apply btn bg-blue-600 text-white hover:bg-blue-700;
+  }
+
+  .btn-secondary {
+    @apply btn bg-slate-100 text-slate-700 hover:bg-slate-200;
+  }
+
+  .btn-success {
+    @apply btn bg-emerald-600 text-white hover:bg-emerald-700;
+  }
+
+  .btn-ghost {
+    @apply btn text-slate-600 hover:bg-slate-100;
+  }
+
+  .btn-sm {
+    @apply px-2 py-1 text-xs;
+  }
+
+  .btn-icon {
+    @apply inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-600
+      transition-colors hover:bg-slate-100 disabled:pointer-events-none disabled:opacity-40;
+  }
+
+  /* Flat sections — no boxes */
+  .card {
+    @apply bg-transparent;
+  }
+
+  .card-section {
+    @apply my-2 py-2;
+  }
+
+  .field {
+    @apply py-1.5;
+  }
+
+  .input {
+    @apply rounded-md bg-slate-50 px-2 py-1.5 text-sm text-slate-800
+      placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500;
+  }
+
+  .input-compact {
+    @apply rounded bg-slate-50 px-1.5 py-1 text-sm text-slate-800
+      placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500;
+  }
+
+  .spinner {
+    @apply animate-spin rounded-full border-2 border-slate-200 border-t-blue-600;
+  }
+
+  .modal-backdrop {
+    @apply fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-[1px];
+  }
+
+  .modal-panel {
+    @apply max-h-[90vh] w-full overflow-y-auto rounded-xl bg-white shadow-xl;
+  }
+
+  .toggle-track {
+    @apply h-5 w-9 rounded-full bg-slate-200 transition-colors
+      after:absolute after:left-[2px] after:top-[2px] after:h-4 after:w-4 after:rounded-full
+      after:bg-white after:shadow-sm after:transition-all after:content-['']
+      peer-checked:bg-blue-600 peer-checked:after:translate-x-full
+      peer-focus:outline-none;
+  }
+
+  .hint-banner {
+    @apply relative my-2 rounded-md bg-amber-50 px-3 py-2.5 text-sm text-amber-950;
+  }
+
+  .error-banner {
+    @apply my-2 rounded-md bg-red-50 px-2.5 py-2 text-sm text-red-700 whitespace-pre-line;
   }
 }
 

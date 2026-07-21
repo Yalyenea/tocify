@@ -1,15 +1,17 @@
 <script lang="ts">
-  import {fade, slide} from 'svelte/transition';
+  import {fade} from 'svelte/transition';
   import {t} from 'svelte-i18n';
   import {createEventDispatcher} from 'svelte';
 
   import Header from '../Header.svelte';
-  import ApiSetting from '../settings/ApiSetting.svelte';
   import TocSettings from '../settings/TocSetting.svelte';
+  import ModelPicker from '../settings/ModelPicker.svelte';
   import AiPageSelector from '../PageSelector.svelte';
   import TocEditor from '../TocEditor.svelte';
+  import SettingsModal from '../modals/SettingsModal.svelte';
   import {Sparkles, X} from 'lucide-svelte';
   import {curFileFingerprint} from '../../stores';
+  import {apiConfig} from '$lib/api-config';
 
   export let pdfState: any;
   export let originalPdfInstance: any;
@@ -24,21 +26,22 @@
   export let isTocConfigExpanded: boolean;
 
   export let config: any;
-  export let customApiConfig: any;
   export let tocPageCount: number;
   export let isPreviewMode: boolean;
 
   const dispatch = createEventDispatcher();
   export let tocEditor: any = undefined;
+
+  let showSettingsModal = false;
 </script>
 
-<div class="w-full lg:w-[35%] flex-shrink-0">
-  <Header on:openhelp={() => dispatch('openhelp')} />
-
-  <ApiSetting
-    on:change={(e) => dispatch('apiConfigChange', e.detail)}
-    on:save={() => dispatch('apiConfigSave')}
+<div class="flex h-auto min-h-0 w-full flex-shrink-0 flex-col overflow-y-auto px-3 py-3 lg:h-full lg:w-[380px] lg:border-l lg:border-slate-100 xl:w-[420px]">
+  <Header
+    on:openhelp={() => dispatch('openhelp')}
+    on:opensettings={() => (showSettingsModal = true)}
   />
+
+  <ModelPicker on:openSettings={() => (showSettingsModal = true)} />
 
   <TocSettings
     {config}
@@ -55,28 +58,28 @@
 
   {#if showNextStepHint && originalPdfInstance}
     <div
-      class="relative border-black border-2 rounded-lg p-3 my-4 bg-yellow-200 shadow-[2px_2px_0px_rgba(0,0,0,1)]"
+      class="hint-banner"
       transition:fade={{duration: 200}}
     >
       <button
-        class="absolute top-1 right-1 p-1 hover:bg-black/10 rounded-full transition-colors"
+        class="absolute right-1.5 top-1.5 rounded-md p-1 text-amber-700/70 hover:bg-amber-100 hover:text-amber-900"
         on:click={() => dispatch('closeNextStepHint')}
         title={$t('btn.close_hint')}
       >
-        <X size={16} />
+        <X size={14} />
       </button>
-      <h3 class="font-bold mb-2">{$t('hint.next_step_title')}:</h3>
-      <p class="text-sm text-gray-800">
-        1. {$t('hint.step_1_text')} <strong class="text-black">{$t('hint.step_1_bold')}</strong>
+      <h3 class="mb-1.5 pr-6 text-sm font-medium">{$t('hint.next_step_title')}</h3>
+      <p class="text-xs leading-5 text-amber-900/90">
+        1. {$t('hint.step_1_text')} <strong>{$t('hint.step_1_bold')}</strong>
       </p>
-      <p class="text-sm text-gray-800 mt-1">
-        2. {$t('hint.step_2_text')} <strong class="text-black">{$t('hint.step_2_bold')}</strong>
+      <p class="mt-1 text-xs leading-5 text-amber-900/90">
+        2. {$t('hint.step_2_text')} <strong>{$t('hint.step_2_bold')}</strong>
       </p>
-      <p class="text-sm text-gray-800 mt-2">
-        {$t('hint.or_text')} <strong class="text-black">{$t('hint.manual_add_bold')}</strong>
+      <p class="mt-1.5 text-xs leading-5 text-amber-900/90">
+        {$t('hint.or_text')} <strong>{$t('hint.manual_add_bold')}</strong>
         {$t('hint.manual_add_text')}
       </p>
-      <p class="text-sm text-gray-800 mt-1">
+      <p class="mt-1 text-xs leading-5 text-amber-900/90">
         {$t('hint.multi_select_tip')}
       </p>
     </div>
@@ -97,7 +100,7 @@
   {/if}
 
   <button
-    class="btn w-full my-2 font-bold bg-blue-400 transition-all duration-300 text-black border-2 border-black rounded-lg px-3 py-2 shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] disabled:bg-gray-300 disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0"
+    class="btn-primary my-2 w-full"
     on:click={() => dispatch('generateAi')}
     title={isAiLoading
       ? $t('status.generating')
@@ -109,18 +112,15 @@
     {#if isAiLoading}
       <span>{$t('btn.generating')}</span>
     {:else}
-      <span>
-        <Sparkles
-          size={16}
-          class="inline-block mr-1"
-        />
-        {$t('btn.generate_toc_ai')}</span
-      >
+      <span class="inline-flex items-center gap-1.5">
+        <Sparkles size={15} />
+        {$t('btn.generate_toc_ai')}
+      </span>
     {/if}
   </button>
 
   {#if aiError}
-    <div class="my-2 p-3 bg-red-100 border-2 border-red-700 text-red-700 rounded-lg whitespace-pre-line">
+    <div class="error-banner">
       {aiError}
     </div>
   {/if}
@@ -135,8 +135,13 @@
       isPreview={isPreviewMode}
       pageOffset={config.pageOffset}
       insertAtPage={config.insertAtPage}
-      apiConfig={customApiConfig}
+      apiConfig={$apiConfig}
       {tocPageCount}
     />
   {/key}
 </div>
+
+<SettingsModal
+  bind:show={showSettingsModal}
+  on:save={() => dispatch('apiConfigSave')}
+/>

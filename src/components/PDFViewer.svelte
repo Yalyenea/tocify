@@ -553,13 +553,13 @@
   on:touchcancel={handlePointerUp}
 />
 
-<div class="h-[85vh] rounded-lg relative w-full bg-white">
+<div class="relative h-full min-h-[50vh] w-full bg-white lg:min-h-0">
   <div
-    class="flex flex-col h-full absolute w-full inset-0 z-10 bg-white rounded-md"
+    class="absolute inset-0 z-10 flex h-full w-full flex-col bg-white"
     class:hidden={mode !== 'single'}
   >
     <div
-      class="flex items-center flex-col justify-start w-full px-2 md:px-4 py-2 bg-white border-b-2 border-black rounded-t-md overflow-x-auto"
+      class="flex w-full flex-col items-center justify-start overflow-x-auto bg-white px-2 py-1.5 md:px-3"
     >
       <div class="flex z-10 items-center justify-between w-full">
         <div class="w-[70%] text-gray-600 font-serif flex gap-1 sm:gap-2 items-center text-sm md:text-base">
@@ -579,10 +579,10 @@
                   e.currentTarget.value = currentPage.toString();
                 }
               }}
-              class="w-15 text-center border-b border-gray-300 focus:border-black outline-none bg-transparent p-0 text-gray-800"
+              class="w-12 border-b border-slate-200 bg-transparent p-0 text-center text-slate-800 outline-none focus:border-blue-500"
             />
             {#if currentPageLabel}
-              <span class="text-xs text-gray-400 font-mono">({currentPageLabel})</span>
+              <span class="text-xs text-slate-400">({currentPageLabel})</span>
             {/if}
             <span class="min-w-12">/ {activeTotalPages}</span>
           </div>
@@ -590,7 +590,7 @@
           {#if tocPdfInstance && jumpToTocPage}
             <button
               on:click={jumpToTocPage}
-              class="p-1 sm:min-w-12 py-0.5 rounded-lg hover:bg-gray-100 text-black border-2 border-black shadow-[1px_1px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] transition-all disabled:opacity-50 disabled:cursor-not-allowed text-xs"
+              class="btn-secondary btn-sm py-0.5 sm:min-w-12"
               title={$t('tooltip.jump_toc')}
             >
               <ListOrdered
@@ -639,7 +639,7 @@
       {#if currentTocPath.length > 0}
         <div class="absolute z-30 pointer-events-none max-w-[70%] md:max-w-[60%]">
           <div
-            class="backdrop-blur-sm border border-gray-200 p-2 text-xs rounded-[0_0_20px_0] backdrop-blur-sm bg-white/20 text-gray-600 font-mono space-y-0.5"
+            class="space-y-0.5 rounded-br-md bg-white/80 p-2 text-xs text-slate-600 backdrop-blur-sm"
           >
             {#each currentTocPath as item, i}
               <div
@@ -659,9 +659,9 @@
       <button
         on:click={goToPrevPage}
         disabled={currentPage <= 1}
-        class="absolute left-2 top-1/2 -translate-y-1/2 p-1 md:left-4 md:p-2 rounded-full bg-white shadow-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed z-20 border-2 border-black"
+        class="absolute left-2 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white/90 p-1.5 text-slate-600 shadow-sm hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40 md:left-4 md:p-2"
       >
-        <ChevronLeft size={24} />
+        <ChevronLeft size={20} />
       </button>
 
       <div class="w-full h-full overflow-auto flex">
@@ -676,9 +676,9 @@
       <button
         on:click={goToNextPage}
         disabled={currentPage >= activeTotalPages}
-        class="absolute right-2 top-1/2 -translate-y-1/2 p-1 md:right-4 md:p-2 rounded-full bg-white shadow-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed z-20 border-2 border-black"
+        class="absolute right-2 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white/90 p-1.5 text-slate-600 shadow-sm hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40 md:right-4 md:p-2"
       >
-        <ChevronRight size={24} />
+        <ChevronRight size={20} />
       </button>
     </div>
   </div>
@@ -689,7 +689,7 @@
     use:observeViewport
   >
     <div
-      class="grid grid-cols-2 gap-3 p-3 select-none md:grid-cols-3 md:gap-4 2xl:grid-cols-4 2xl:gap-5"
+      class="grid select-none grid-cols-2 gap-2 p-2 md:grid-cols-3 md:gap-3 2xl:grid-cols-4 2xl:gap-3"
       class:cursor-grabbing={isSelecting}
       on:touchmove|nonpassive={handleTouchMove}
       on:touchend={handlePointerUp}
@@ -707,16 +707,7 @@
 
         <div
           data-page-num={page.pageNum}
-          class="relative rounded-lg overflow-hidden border-t-[2px] border-l-[2px] cursor-pointer bg-white transition-all duration-150 transform border-2"
-          class:shadow-[3px_3px_0px]={isSelected}
-          class:shadow-blue-400={isSelected && isActive}
-          class:shadow-gray-400={isSelected && !isActive}
-          class:border-blue-500={isSelected && isActive}
-          class:border-gray-500={(isSelected && !isActive) || !isSelected}
-          class:scale-[1.02]={isSelected}
-          class:ring-4={highlightPageNum === page.pageNum}
-          class:ring-green-400={highlightPageNum === page.pageNum}
-          class:ring-offset-2={highlightPageNum === page.pageNum}
+          class="relative cursor-pointer overflow-hidden rounded-sm bg-white transition-all duration-150 {isSelected && isActive ? 'ring-2 ring-blue-500' : isSelected ? 'ring-1 ring-slate-300' : 'ring-1 ring-slate-100'} {highlightPageNum === page.pageNum ? 'ring-2 ring-blue-400' : ''}"
           style="-webkit-touch-callout: none;"
           on:mousedown={() => handleMouseDown(page.pageNum)}
           on:touchstart={() => handleTouchStart(page.pageNum)}

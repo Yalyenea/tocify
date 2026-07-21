@@ -1,39 +1,48 @@
 <script lang="ts">
   import {createEventDispatcher} from 'svelte';
-  import {Github, HelpCircle} from 'lucide-svelte';
+  import {t} from 'svelte-i18n';
+  import {Github, HelpCircle, Settings2} from 'lucide-svelte';
   import Logo from '../assets/logo.svelte';
   import LanguageSwitch from '../components/LanguageSwitch.svelte';
 
   const dispatch = createEventDispatcher();
 </script>
 
-<div class="flex justify-between items-start gap-4">
-  <div>
+<div class="mb-1 flex items-start justify-between gap-3">
+  <div class="min-w-0">
     <div class="flex items-center gap-2">
       <Logo />
-      <h1 class="text-3xl tracking-widest font-semibold">Tocify</h1>
+      <h1 class="text-xl font-semibold tracking-tight text-slate-900">Tocify</h1>
     </div>
-    <p class="text-xs text-gray-700 mt-1 pl-1">PDF ToC Editor powered by AI</p>
+    <p class="mt-0.5 text-xs text-slate-500">PDF ToC Editor powered by AI</p>
   </div>
 
-  <div class="flex items-center gap-2 pt-2">
+  <div class="flex items-center gap-0.5 pt-0.5">
+    <button
+      on:click={() => dispatch('opensettings')}
+      class="btn-icon"
+      title={$t('settings.api_settings_title')}
+      aria-label={$t('settings.api_settings_title')}
+    >
+      <Settings2 size={18} />
+    </button>
     <a
       href="https://github.com/Yalyenea/tocify"
       target="_blank"
       rel="noopener noreferrer"
-      class="text-black hover:text-gray-700 transition-colors"
+      class="btn-icon"
       title="View on GitHub"
       aria-label="View project on GitHub"
     >
-      <Github size={30} />
+      <Github size={18} />
     </a>
     <button
       on:click={() => dispatch('openhelp')}
-      class="text-black hover:text-gray-700 transition-colors"
+      class="btn-icon"
       title="How to Use"
       aria-label="How to Use ?"
     >
-      <HelpCircle size={30} />
+      <HelpCircle size={18} />
     </button>
     <LanguageSwitch />
   </div>

@@ -2,6 +2,9 @@
 
 ## Unreleased - 2026-07-21
 
+- Redesigned the UI from neo-brutal hard borders/shadows to a flat, compact, full-bleed layout: PDF on the left, controls on the right, no card frames.
+- Shared component tokens for buttons, fields, and modals.
+- Multi-provider profiles with a two-column Settings modal (list + detail, add custom providers); homepage row switches provider and models together.
 - Removed the knowledge board feature (UI drawer, generate-board API, graph layout utils, and roughjs dependency).
 
 ## Unreleased - 2026-05-19

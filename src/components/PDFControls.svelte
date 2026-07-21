@@ -12,38 +12,38 @@
   const dispatch = createEventDispatcher();
 </script>
 
-<div class="flex flex-col md:flex-row md:justify-end gap-3 md:gap-2 pt-4 relative z-10 mx-3 md:mr-3 md:mx-0">
+<div class="relative z-10 flex flex-col gap-2 px-3 py-2 md:flex-row md:justify-end">
   <button
-    class="btn flex gap-2 items-center justify-center font-bold bg-white text-black border-2 border-black rounded-lg px-4 py-2 shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all disabled:bg-gray-300 disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0 w-full md:w-auto"
+    class="btn-secondary w-full md:w-auto"
     on:click={() => dispatch('triggerUpload')}
     title={$t('tooltip.upload_new')}
-    in:fly={{y: 10, duration: 250, delay: 0}}
+    in:fly={{y: 8, duration: 200, delay: 0}}
   >
-    <Upload size={16} />
+    <Upload size={15} />
     {$t('btn.upload_new')}
   </button>
   <button
-    class="btn flex gap-2 items-center justify-center font-bold bg-yellow-400 text-black border-2 border-black rounded-lg px-4 py-2 shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all disabled:bg-gray-300 disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0 w-full md:w-auto"
+    class="btn-secondary w-full md:w-auto"
     on:click={() => dispatch('togglePreview')}
     disabled={!originalPdfInstance || isPreviewLoading}
     title={isPreviewMode
       ? $t('tooltip.switch_edit')
       : $t('tooltip.switch_preview')}
-    in:fly={{y: 10, duration: 250, delay: 100}}
+    in:fly={{y: 8, duration: 200, delay: 60}}
   >
     {#key isPreviewLoading.toString() + isPreviewMode.toString()}
       <div
-        class="flex gap-2 items-center justify-center"
-        in:fade={{duration: 150}}
+        class="flex items-center justify-center gap-1.5"
+        in:fade={{duration: 120}}
       >
         {#if isPreviewLoading}
-          <div class="animate-spin rounded-full h-4 w-4 border-2 border-black border-t-transparent"></div>
+          <div class="spinner h-3.5 w-3.5"></div>
           {$t('btn.loading')}
         {:else if isPreviewMode}
-          <PencilIcon size={16} />
+          <PencilIcon size={15} />
           {$t('btn.select_grid')}
         {:else}
-          <EyeIcon size={16} />
+          <EyeIcon size={15} />
           {$t('btn.preview')}
         {/if}
       </div>
@@ -51,25 +51,25 @@
   </button>
   <div
     class="flex w-full md:w-auto"
-    in:fly={{y: 10, duration: 250, delay: 200}}
+    in:fly={{y: 8, duration: 200, delay: 120}}
   >
     <button
-      class="btn flex-1 md:flex-none flex gap-2 items-center justify-center font-bold bg-green-500 text-black border-2 border-black rounded-l-lg px-4 py-2 shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all disabled:bg-gray-300 disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0"
+      class="btn-success flex-1 rounded-r-none md:flex-none"
       on:click={() => dispatch('export')}
       disabled={!doc}
       title={$t('tooltip.export_pdf')}
     >
-      <Download size={16} />
+      <Download size={15} />
       {$t('btn.generate_pdf')}
     </button>
     <button
-      class="btn flex items-center justify-center font-bold bg-green-500 text-black border-y-2 border-r-2 border-black rounded-r-lg px-2.5 py-2 shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all disabled:bg-gray-300 disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0"
+      class="btn-success rounded-l-none border-l border-emerald-500/40 px-2.5"
       on:click={() => dispatch('openChapterExport')}
       disabled={!doc}
       title={$t('tooltip.export_chapters')}
       aria-label={$t('tooltip.export_chapters')}
     >
-      <Menu size={16} />
+      <Menu size={15} />
     </button>
   </div>
 </div>

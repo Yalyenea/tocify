@@ -8,7 +8,7 @@
   export let width = 'w-48';
   export let isTextCopiable = false;
 
-  export let color = 'bg-gradient-to-tr from-blue-300/70 to-pink-300/60 ';
+  export let color = 'bg-white';
 
   let isVisible = false;
   let timer = null;
@@ -55,27 +55,27 @@
   $: customStyle = isCustomPosition  ? `left: ${customCoords[0]}; top: ${customCoords[1]}; margin: 0;` : '';
 
   const getFlyParams = (pos) => {
-    if (isCustomPosition) return { y: 10 };
+    if (isCustomPosition) return { y: 8 };
     switch (pos) {
       case 'top':
-        return {y: 10};
+        return {y: 8};
       case 'bottom':
-        return {y: -10};
+        return {y: -8};
       case 'left':
-        return {x: 10};
+        return {x: 8};
       case 'right':
-        return {x: -10};
+        return {x: -8};
       default:
-        return {y: 10};
+        return {y: 8};
     }
   };
 </script>
 
-<div class={'relative inline-block font-mono' + className}>
+<div class={'relative inline-block ' + className}>
   <div
     role="button"
     tabindex="0"
-    class="cursor-pointer inline-block"
+    class="inline-block cursor-pointer"
     on:mouseenter={setVisible}
     on:mouseleave={delay(setInVisible)}
   >
@@ -84,27 +84,25 @@
 
   {#if isVisible}
     <button
-      transition:fly={{...getFlyParams(position), duration: 300, easing: backOut}}
+      transition:fly={{...getFlyParams(position), duration: 200, easing: backOut}}
       on:mouseenter={setVisible}
       on:mouseleave={delay(setInVisible)}
       on:click={isTextCopiable ? copyText : null}
       style={customStyle}
       class={`
-        absolute z-50 p-2 md:px-4 md:py-3 font-mono text-sm text-gray-900 border-2 border-black
-        shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]  rounded-md
-        backdrop-blur-sm break-words
-        whitespace-pre-line text-left ${width} ${color}
-        ${isTextCopiable ? 'cursor-copy active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all' : ''}
+        absolute z-50 rounded-md bg-white p-2 text-left text-xs leading-5 text-slate-700 shadow-lg
+        break-words whitespace-pre-line md:px-3 md:py-2 ${width} ${color}
+        ${isTextCopiable ? 'cursor-copy' : ''}
         
-        ${!isCustomPosition && position === 'top' ? 'bottom-full left-1/2 transform -translate-x-1/2 mb-3' : ''}
-        ${!isCustomPosition && position === 'bottom' ? 'top-full left-1/2 transform -translate-x-1/2 mt-3' : ''}
-        ${!isCustomPosition && position === 'left' ? 'right-full top-1/2 transform -translate-y-1/2 mr-3' : ''}
-        ${!isCustomPosition && position === 'right' ? 'left-full top-1/2 transform -translate-y-1/2 ml-3' : ''}
+        ${!isCustomPosition && position === 'top' ? 'bottom-full left-1/2 mb-2 -translate-x-1/2 transform' : ''}
+        ${!isCustomPosition && position === 'bottom' ? 'top-full left-1/2 mt-2 -translate-x-1/2 transform' : ''}
+        ${!isCustomPosition && position === 'left' ? 'right-full top-1/2 mr-2 -translate-y-1/2 transform' : ''}
+        ${!isCustomPosition && position === 'right' ? 'left-full top-1/2 ml-2 -translate-y-1/2 transform' : ''}
       `}
     >
-      <div class="relative z-10 drop-shadow-sm">
+      <div class="relative z-10">
         {#if isCopied}
-          <span class="inline-block uppercase tracking-widest font-black">COPIED!</span>
+          <span class="inline-block text-[11px] font-semibold uppercase tracking-wide text-blue-600">Copied</span>
         {:else}
           {text}
         {/if}
